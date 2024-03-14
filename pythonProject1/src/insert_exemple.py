@@ -14,9 +14,9 @@ def delete_all_records():
 
 delete_all_records()
 
-create_algorithm(id="1", name="AES", framework="PyCrypto")
-create_algorithm(id="2", name="RSA", framework="OpenSSL")
-create_algorithm(id="3", name="SHA-256", framework="Hashlib")
+create_algorithm(id="1", name="AES", framework="PyCrypto", symetric=True)
+create_algorithm(id="2", name="RSA", framework="OpenSSL", symetric=False)
+create_algorithm(id="3", name="SHA-256", framework="Hashlib", symetric=False)
 
 
 create_file(id="file1", bytes=1024, encrypted=True)

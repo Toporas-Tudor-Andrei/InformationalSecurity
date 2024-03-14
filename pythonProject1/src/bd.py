@@ -11,6 +11,7 @@ class Algorithm(Base):
     id = Column(String, primary_key=True)
     name = Column(String, nullable=False)
     framework = Column(String, nullable=False)
+    symetric = Column(Boolean, nullable=False)
 
 class File(Base):
     __tablename__ = 'file'
@@ -43,9 +44,9 @@ class PerformanceLogs(Base):
     file = relationship('File')
     algorithm = relationship('Algorithm')
 
-def create_algorithm(id, name, framework):
+def create_algorithm(id, name, framework, symetric):
     session = Session()
-    algorithm = Algorithm(id=id, name=name, framework=framework)
+    algorithm = Algorithm(id=id, name=name, framework=framework, symetric=symetric)
     session.add(algorithm)
     session.commit()
     session.close()
@@ -56,11 +57,12 @@ def read_algorithm(id):
     session.close()
     return algorithm
 
-def update_algorithm(id, name, framework):
+def update_algorithm(id, name, framework, symetric):
     session = Session()
     algorithm = session.query(Algorithm).filter(Algorithm.id == id).first()
     algorithm.name = name
     algorithm.framework = framework
+    algorithm.symetric = symetric
     session.commit()
     session.close()
 
