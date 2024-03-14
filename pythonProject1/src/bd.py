@@ -78,6 +78,7 @@ class File(Base):
     __tablename__ = 'file'
 
     id = Column(String, primary_key=True)
+    hash = Column(String, nullable=False)
     bytes = Column(Integer, nullable=False)
     encrypted = Column(Boolean, nullable=False)
 

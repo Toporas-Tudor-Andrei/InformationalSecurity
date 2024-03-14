@@ -19,8 +19,8 @@ algRepo.insert(Algorithm(id="1", name="AES", framework="PyCrypto", symetric=True
 algRepo.insert(Algorithm(id="2", name="RSA", framework="OpenSSL", symetric=False))
 algRepo.insert(Algorithm(id="3", name="SHA-256", framework="Hashlib", symetric=False))
 
-fileRepo.insert(File(id="file1", bytes=1024, encrypted=True))
-fileRepo.insert(File(id="file2", bytes=2048, encrypted=False))
+fileRepo.insert(File(id="file1", hash="20894vucbgh209v", bytes=1024, encrypted=True))
+fileRepo.insert(File(id="file2", hash="920uc3rbn2093ub", bytes=2048, encrypted=False))
 
 keyRepo.insert(Key(file_id="file1", algorithm_id="1", isprivate=True, encryptionkey="random_key_1"))
 keyRepo.insert(Key(file_id="file2", algorithm_id="2", isprivate=False, encryptionkey="random_key_2"))
