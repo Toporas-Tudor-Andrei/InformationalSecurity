@@ -15,9 +15,14 @@ def delete_all_records():
 
 delete_all_records()
 
-algRepo.insert(Algorithm(id="1", name="AES", framework="PyCrypto", symetric=True))
+algRepo.insert(Algorithm(id="1", name="AES", framework="OpenSSL", symetric=True))
 algRepo.insert(Algorithm(id="2", name="RSA", framework="OpenSSL", symetric=False))
-algRepo.insert(Algorithm(id="3", name="SHA-256", framework="Hashlib", symetric=False))
+algRepo.insert(Algorithm(id="3", name="AES", framework="PyCryptodome", symetric=True))
+algRepo.insert(Algorithm(id="4", name="RSA", framework="PyCryptodome", symetric=False))
+algRepo.insert(Algorithm(id="5", name="AES", framework="Cryptography", symetric=True))
+algRepo.insert(Algorithm(id="6", name="RSA", framework="Cryptography", symetric=False))
+
+print(algRepo.findAll())
 
 fileRepo.insert(File(id="file1", hash="20894vucbgh209v", bytes=1024, encrypted=True))
 fileRepo.insert(File(id="file2", hash="920uc3rbn2093ub", bytes=2048, encrypted=False))

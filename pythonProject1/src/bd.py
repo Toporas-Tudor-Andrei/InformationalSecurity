@@ -1,8 +1,10 @@
 from sqlalchemy import create_engine, Column, Integer, String, Boolean, ForeignKey, DateTime
 from sqlalchemy.exc import DBAPIError
 from sqlalchemy.orm import declarative_base, sessionmaker, relationship
+import os
 
-engine = create_engine('sqlite:///database.db')
+dbFolder = os.path.dirname(__file__)
+engine = create_engine(f'sqlite:///{dbFolder}/database.db')
 Base = declarative_base()
 Session = sessionmaker(bind=engine)
 

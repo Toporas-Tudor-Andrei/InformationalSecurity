@@ -4,10 +4,11 @@ from criptograpy_module.EncryptionAdapter import EncryptionAdapter
 from criptograpy_module.KeyGenerator import KeyGenerator
 from criptograpy_module.OpenSSL import OpenSSL
 from criptograpy_module.PyCryptodome import PyCryptodome
+import os
 
 
 def select_file():
-    file_path = "/home/maria/Desktop/SI/Proiect/pythonProject/res/fisier_de_test.txt" #input("Enter the file path: ")
+    file_path = os.path.realpath(os.path.join(os.path.dirname(__file__), "../res/fisier_de_test.txt"))
     try:
         with open(file_path, 'r') as file:
             return file.read()
@@ -50,7 +51,7 @@ def select_framework():
 if __name__ == "__main__":
     file_content = select_file()
     algorithms = ['AES', 'RSA']
-    frameworks = [(Cryptography, "Cryptography"), (OpenSSL, "OpenSSL"), (PyCryptodome, "PyCryptodome")]
+    frameworks = [(Cryptography, "Cryptography"), (PyCryptodome, "PyCryptodome")]
 
     aes_key = KeyGenerator.generate_aes_key()
 
