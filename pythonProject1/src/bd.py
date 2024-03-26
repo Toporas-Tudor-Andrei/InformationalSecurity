@@ -10,6 +10,9 @@ Session = sessionmaker(bind=engine)
 
 
 class Repository:
+    """
+    Generic class that encapsulates the crud operations on a sqlalchemy entity class (derives Base)
+    """
     def __init__(self, model, sessionMaker):
         self.__model = model
         self.__sessionMaker = sessionMaker
@@ -17,9 +20,18 @@ class Repository:
 
     @staticmethod
     def of(model):
+        """
+        Factory method
+        :param model: sqlalchemy entity class on witch to create the repository around
+        :return: the created repository
+        """
         return Repository(model, Session)
 
     def operation(func):
+        """
+        Decorator for handling sessions
+        :return:
+        """
         def inner(self, *args, **kwargs):
             self.session = self.__sessionMaker()
             try:

@@ -8,6 +8,9 @@ from criptograpy_module.KeyGenerator import KeyGenerator
 
 
 class OpenSSL:
+    """
+    Quacks like a framework
+    """
 
     @time_it
     @staticmethod

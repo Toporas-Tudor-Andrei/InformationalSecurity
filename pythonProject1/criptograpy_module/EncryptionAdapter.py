@@ -1,5 +1,12 @@
 class EncryptionAdapter:
+    """
+    Class that encapsulates multiple framework, algorithm pairs for ease of use
+    """
     def __init__(self, encryption_library):
+        """
+        Constructor
+        :param encryption_library: class that quacks like a framework
+        """
         self.encryption_library = encryption_library
 
     def encrypt(self, plaintext, key, algorithm):

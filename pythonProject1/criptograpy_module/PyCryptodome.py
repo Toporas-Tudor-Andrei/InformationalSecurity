@@ -8,6 +8,9 @@ from Performance.Decorators import *
 
 
 class PyCryptodome:
+    """
+    Quacks like a framework
+    """
     @time_it
     @staticmethod
     def encrypt_aes(plaintext, key):

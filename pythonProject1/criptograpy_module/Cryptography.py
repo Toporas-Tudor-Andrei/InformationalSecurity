@@ -7,6 +7,9 @@ from cryptography.hazmat.primitives import padding
 
 
 class Cryptography:
+    """
+    Quacks like a framework
+    """
     @time_it
     @staticmethod
     def encrypt_aes(plaintext, key):

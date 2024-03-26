@@ -3,6 +3,11 @@ from functools import wraps
 
 
 def time_it(func):
+    """
+    Decorator function that tracks the time of execution of the function that it decorates
+    :param func: function to be decorated
+    :return: a tuple of length 2 containing the execution time and the result of the function
+    """
     @wraps(func)
     def wrapper(*args, **kwargs):
         start = time.time()
