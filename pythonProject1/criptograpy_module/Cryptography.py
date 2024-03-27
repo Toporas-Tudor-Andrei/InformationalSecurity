@@ -42,6 +42,65 @@ class Cryptography:
 
     @time_it
     @staticmethod
+    def encrypt_3des(plaintext, key):
+        if len(key) * 8 != 192:
+            raise ValueError("Key length must be 192 bits")
+
+        iv = b'\x00' * 8
+        padder = padding.PKCS7(64).padder()
+        padded_plaintext = padder.update(plaintext.encode()) + padder.finalize()
+
+        cipher = Cipher(algorithms.TripleDES(key), modes.CBC(iv), backend=default_backend())
+        encryptor = cipher.encryptor()
+        ciphertext = encryptor.update(padded_plaintext)
+        return iv + ciphertext
+
+    @time_it
+    @staticmethod
+    def decrypt_3des(ciphertext, key):
+        iv = ciphertext[:8]
+        ciphertext_data = ciphertext[8:]
+
+        cipher = Cipher(algorithms.TripleDES(key), modes.CBC(iv), backend=default_backend())
+        decryptor = cipher.decryptor()
+        decrypted_padded_plaintext = decryptor.update(ciphertext_data) + decryptor.finalize()
+
+        unpadder = padding.PKCS7(64).unpadder()
+        plaintext = unpadder.update(decrypted_padded_plaintext) + unpadder.finalize()
+
+        return plaintext.decode()
+
+
+    @time_it
+    @staticmethod
+    def encrypt_blowfish(plaintext, key):
+        iv = b'\x00' * 8
+        padder = padding.PKCS7(64).padder()
+        padded_plaintext = padder.update(plaintext.encode()) + padder.finalize()
+
+        cipher = Cipher(algorithms.Blowfish(key), modes.CBC(iv), backend=default_backend())
+        encryptor = cipher.encryptor()
+        ciphertext = encryptor.update(padded_plaintext)
+        return iv + ciphertext
+
+
+    @time_it
+    @staticmethod
+    def decrypt_blowfish(ciphertext, key):
+        iv = ciphertext[:8]
+        ciphertext_data = ciphertext[8:]
+
+        cipher = Cipher(algorithms.Blowfish(key), modes.CBC(iv), backend=default_backend())
+        decryptor = cipher.decryptor()
+        decrypted_padded_plaintext = decryptor.update(ciphertext_data) + decryptor.finalize()
+
+        unpadder = padding.PKCS7(64).unpadder()
+        plaintext = unpadder.update(decrypted_padded_plaintext) + unpadder.finalize()
+
+        return plaintext.decode()
+
+    @time_it
+    @staticmethod
     def encrypt_rsa(plaintext, public_key):
         public_key = serialization.load_pem_public_key(public_key, backend=default_backend())
         ciphertext = public_key.encrypt(

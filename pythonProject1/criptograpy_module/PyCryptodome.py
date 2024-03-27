@@ -1,11 +1,8 @@
 import os
-
-from Crypto.Cipher import PKCS1_OAEP, AES
+from Crypto.Cipher import PKCS1_OAEP, AES, DES3, Blowfish
 from Crypto.PublicKey import RSA
 from Crypto.Util import Padding
-
 from Performance.Decorators import *
-
 
 class PyCryptodome:
     """
@@ -17,7 +14,7 @@ class PyCryptodome:
         if len(key) != 32:
             raise ValueError("Key length must be 256 bits")
 
-        iv = b'\x00' * 16
+        iv = os.urandom(16)
         cipher = AES.new(key, AES.MODE_CBC, iv)
         padded_plaintext = Padding.pad(plaintext.encode(), AES.block_size)
         ciphertext = cipher.encrypt(padded_plaintext)
@@ -35,6 +32,51 @@ class PyCryptodome:
         decrypted_text = cipher.decrypt(ciphertext)
         unpadded_text = Padding.unpad(decrypted_text, AES.block_size)
         return unpadded_text.decode()
+
+    @time_it
+    @staticmethod
+    def encrypt_3des(plaintext, key):
+        if len(key) != 24:
+            raise ValueError("Key length must be 64 bits")
+
+        iv = os.urandom(8)
+        cipher = DES3.new(key, DES3.MODE_CBC, iv)
+        padded_plaintext = Padding.pad(plaintext.encode(), DES3.block_size)
+        ciphertext = cipher.encrypt(padded_plaintext)
+        return iv + ciphertext
+
+    @time_it
+    @staticmethod
+    def decrypt_3des(ciphertext, key):
+        if len(key) != 24:
+            raise ValueError("Key length must be 192 bits")
+
+        iv = ciphertext[:8]
+        ciphertext = ciphertext[8:]
+        cipher = DES3.new(key, DES3.MODE_CBC, iv)
+        decrypted_text = cipher.decrypt(ciphertext)
+        unpadded_text = Padding.unpad(decrypted_text, DES3.block_size)
+        return unpadded_text.decode()
+
+    @time_it
+    @staticmethod
+    def encrypt_blowfish(plaintext, key):
+        iv = os.urandom(8)
+        cipher = Blowfish.new(key, Blowfish.MODE_CBC, iv)
+        padded_plaintext = Padding.pad(plaintext.encode(), Blowfish.block_size)
+        ciphertext = cipher.encrypt(padded_plaintext)
+        return iv + ciphertext
+
+    @time_it
+    @staticmethod
+    def decrypt_blowfish(ciphertext, key):
+        iv = ciphertext[:8]
+        ciphertext = ciphertext[8:]
+        cipher = Blowfish.new(key, Blowfish.MODE_CBC, iv)
+        decrypted_text = cipher.decrypt(ciphertext)
+        unpadded_text = Padding.unpad(decrypted_text, Blowfish.block_size)
+        return unpadded_text.decode()
+
     @time_it
     @staticmethod
     def encrypt_rsa(plaintext, public_key):

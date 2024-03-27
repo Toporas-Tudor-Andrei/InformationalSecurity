@@ -18,13 +18,17 @@ class EncryptionAdapter:
     def _get_encryptor(self, algorithm):
         encryptors = {
             'AES': self.encryption_library.encrypt_aes,
+            'DES': self.encryption_library.encrypt_des,
             'RSA': self.encryption_library.encrypt_rsa,
+            'BF': self.encryption_library.encrypt_blowfish,
         }
         return encryptors.get(algorithm, lambda x, y: None)
 
     def _get_decryptor(self, algorithm):
         decryptors = {
             'AES': self.encryption_library.decrypt_aes,
+            'DES': self.encryption_library.decrypt_desq,
             'RSA': self.encryption_library.decrypt_rsa,
+            'BF': self.encryption_library.decrypt_blowfish,
         }
         return decryptors.get(algorithm, lambda x, y: None)

@@ -21,6 +21,7 @@ class OpenSSL:
         iv_hex = iv.hex()
         key_hex = key.hex()
         openssl_cmd = f'echo -n "{plaintext}" | openssl enc -aes-256-cbc -base64 -K {key_hex} -iv {iv_hex}'
+        print(openssl_cmd)
         encrypted_text = b64decode(subprocess.check_output(openssl_cmd, shell=True))
         return iv + encrypted_text.strip()
 
@@ -33,6 +34,50 @@ class OpenSSL:
         key_hex = key.hex()
         ciphertext_data_hex = b64encode(ciphertext_data).decode('utf-8')
         openssl_cmd = f'echo -n "{ciphertext_data_hex}" | base64 -d | openssl enc -d -aes-256-cbc -K {key_hex} -iv {iv_hex}'
+        decrypted_text = subprocess.check_output(openssl_cmd, shell=True).decode()
+        return decrypted_text.strip()
+
+    @time_it
+    @staticmethod
+    def encrypt_des3(plaintext, key):
+        iv = b'\x00' * 8
+        iv_hex = iv.hex()
+        key_hex = key.hex()
+        openssl_cmd = f'echo -n "{plaintext}" | openssl enc -des3 -base64 -K {key_hex} -iv {iv_hex}'
+        encrypted_text = b64decode(subprocess.check_output(openssl_cmd, shell=True))
+        return iv + encrypted_text.strip()
+
+    @time_it
+    @staticmethod
+    def decrypt_des3(ciphertext, key):
+        iv = ciphertext[:8]
+        ciphertext_data = ciphertext[8:]
+        iv_hex = iv.hex()
+        key_hex = key.hex()
+        ciphertext_data_hex = b64encode(ciphertext_data).decode('utf-8')
+        openssl_cmd = f'echo -n "{ciphertext_data_hex}" | base64 -d | openssl enc -d -des3 -K {key_hex} -iv {iv_hex}'
+        decrypted_text = subprocess.check_output(openssl_cmd, shell=True).decode()
+        return decrypted_text.strip()
+
+    @time_it
+    @staticmethod
+    def encrypt_blowfish(plaintext, key):
+        iv = b'\x00' * 8
+        iv_hex = iv.hex()
+        key_hex = key.hex()
+        openssl_cmd = f'echo -n "{plaintext}" | openssl enc -bf-cbc -base64 -K {key_hex} -iv {iv_hex}'
+        encrypted_text = b64decode(subprocess.check_output(openssl_cmd, shell=True))
+        return iv + encrypted_text.strip()
+
+    @time_it
+    @staticmethod
+    def decrypt_blowfish(ciphertext, key):
+        iv = ciphertext[:8]
+        ciphertext_data = ciphertext[8:]
+        iv_hex = iv.hex()
+        key_hex = key.hex()
+        ciphertext_data_hex = b64encode(ciphertext_data).decode('utf-8')
+        openssl_cmd = f'echo -n "{ciphertext_data_hex}" | base64 -d | openssl enc -d -bf-cbc -K {key_hex} -iv {iv_hex}'
         decrypted_text = subprocess.check_output(openssl_cmd, shell=True).decode()
         return decrypted_text.strip()
 

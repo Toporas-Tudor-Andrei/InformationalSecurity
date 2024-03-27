@@ -12,6 +12,16 @@ class KeyGenerator:
         return os.urandom(32)
 
     @staticmethod
+    def generate_3des_key():
+        """Generate a 192-bit DES key"""
+        return os.urandom(24)
+
+    @staticmethod
+    def generate_blowfish_key():
+        """Generate a 64-bit key"""
+        return os.urandom(16)
+
+    @staticmethod
     def generate_rsa_key_pair():
         """Generate an RSA key pair"""
         private_key = rsa.generate_private_key(
