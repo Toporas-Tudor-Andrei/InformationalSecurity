@@ -18,7 +18,7 @@ class EncryptionAdapter:
     def _get_encryptor(self, algorithm):
         encryptors = {
             'AES': self.encryption_library.encrypt_aes,
-            'DES': self.encryption_library.encrypt_des,
+            'DES': self.encryption_library.encrypt_3des,
             'RSA': self.encryption_library.encrypt_rsa,
             'BF': self.encryption_library.encrypt_blowfish,
         }
@@ -27,7 +27,7 @@ class EncryptionAdapter:
     def _get_decryptor(self, algorithm):
         decryptors = {
             'AES': self.encryption_library.decrypt_aes,
-            'DES': self.encryption_library.decrypt_desq,
+            'DES': self.encryption_library.decrypt_3des,
             'RSA': self.encryption_library.decrypt_rsa,
             'BF': self.encryption_library.decrypt_blowfish,
         }

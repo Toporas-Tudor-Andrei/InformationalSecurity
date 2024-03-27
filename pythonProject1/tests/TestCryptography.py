@@ -81,8 +81,8 @@ class TestOpenSSL(unittest.TestCase):
         self.assertEqual(decrypted_text, self.plaintext)
 
     def test_des3_encryption_decryption(self):
-        (time_performance, ciphertext) = OpenSSL.encrypt_des3(self.plaintext, self.des3_key)
-        (time_performance, decrypted_text) = OpenSSL.decrypt_des3(ciphertext, self.des3_key)
+        (time_performance, ciphertext) = OpenSSL.encrypt_3des(self.plaintext, self.des3_key)
+        (time_performance, decrypted_text) = OpenSSL.decrypt_3des(ciphertext, self.des3_key)
         self.assertEqual(decrypted_text, self.plaintext)
 
     def test_rsa_encryption_decryption(self):

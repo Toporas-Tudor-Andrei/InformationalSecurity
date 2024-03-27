@@ -39,7 +39,7 @@ class OpenSSL:
 
     @time_it
     @staticmethod
-    def encrypt_des3(plaintext, key):
+    def encrypt_3des(plaintext, key):
         iv = b'\x00' * 8
         iv_hex = iv.hex()
         key_hex = key.hex()
@@ -49,7 +49,7 @@ class OpenSSL:
 
     @time_it
     @staticmethod
-    def decrypt_des3(ciphertext, key):
+    def decrypt_3des(ciphertext, key):
         iv = ciphertext[:8]
         ciphertext_data = ciphertext[8:]
         iv_hex = iv.hex()
