@@ -1,75 +1,164 @@
+import os
 import sys
-from PyQt5.QtWidgets import QApplication, QDialog, QVBoxLayout, QPushButton, QLabel, QStackedWidget, QComboBox, \
-    QFileDialog, QWidget
+from PyQt5.QtWidgets import *
+
+from CryptoWrapper.CryptoWrapper import algRepo
+from criptograpy_module.Cryptography import Cryptography
+from criptograpy_module.KeyGenerator import KeyGenerator
 
 
 class MyDialog(QDialog):
     def __init__(self):
         super().__init__()
+        self.encode_button_checked = False
+        self.selected_file_path = None
+        self.initUI()
 
-        self.stacked_widget = QStackedWidget()
+    def initUI(self):
+        self.setWindowTitle('Something')
 
-        buttons_widget = QWidget()
-        encode_button = QPushButton('Encode file')
-        decode_button = QPushButton('Decode file')
-        encode_button.setFixedSize(150, 50)
-        decode_button.setFixedSize(150, 50)
+        self.encode_button = QPushButton('Encode', self)
+        self.encode_button.setCheckable(True)
+        self.decode_button = QPushButton('Decode', self)
+        self.decode_button.setCheckable(True)
 
-        layout_buttons = QVBoxLayout()
-        layout_buttons.addWidget(encode_button)
-        layout_buttons.addWidget(decode_button)
-        buttons_widget.setLayout(layout_buttons)
+        self.encode_button.setFixedSize(100, 30)
+        self.decode_button.setFixedSize(100, 30)
 
-        encode_content_widget = QWidget()
-        encode_content_layout = QVBoxLayout()
+        vbox = QVBoxLayout()
+        vbox.addWidget(self.encode_button)
+        vbox.addWidget(self.decode_button)
 
-        select_algorithm_label = QLabel('Select an algorithm:')
-        algorithm_dropdown = QComboBox()
-        algorithm_dropdown.addItems(['AES', 'RSA', 'SHA-256'])
-        self.algorithm_label = QLabel('')
-        next_button = QPushButton('Next')
-        encode_content_layout.addWidget(select_algorithm_label)
-        encode_content_layout.addWidget(algorithm_dropdown)
-        encode_content_layout.addWidget(self.algorithm_label)
-        encode_content_layout.addWidget(next_button)
-        encode_content_widget.setLayout(encode_content_layout)
+        self.encode_button.clicked.connect(self.encode_action)
+        self.decode_button.clicked.connect(self.decode_action)
 
-        self.stacked_widget.addWidget(buttons_widget)
-        self.stacked_widget.addWidget(encode_content_widget)
+        self.setLayout(vbox)
+        self.setFixedSize(700, 800)
 
-        encode_button.clicked.connect(self.show_encode_content)
-        decode_button.clicked.connect(self.show_decode_content)
-        next_button.clicked.connect(self.show_next_content)
-        algorithm_dropdown.currentIndexChanged.connect(self.update_algorithm_label)
+    def encode_action(self):
+        if not self.encode_button_checked:
+            self.encode_button_checked = True
+            self.decode_button.setChecked(False)
+            frameworks = set()
 
-        layout = QVBoxLayout()
-        layout.addWidget(self.stacked_widget)
-        self.setLayout(layout)
-        self.resize(400, 300)
+            self.algorithm_combo_box = QComboBox(self)
+            algorithms = algRepo.findAll()
+            for algorithm in algorithms:
+                self.algorithm_combo_box.addItem(algorithm.name)
+                frameworks.add(algorithm.framework)
+            vbox = self.layout()
+            vbox.addWidget(self.algorithm_combo_box)
 
+            self.framework_combo_box = QComboBox(self)
+            for framework in frameworks:
+                self.framework_combo_box.addItem(framework)
+            vbox.addWidget(self.framework_combo_box)
+            self.generate_button = QPushButton('Generate', self)
+            self.generate_button.setFixedSize(100, 30)
+            vbox.addWidget(self.generate_button)
+            self.generate_button.setVisible(False)
 
-    def show_next_content(self):
-        self.stacked_widget.setCurrentIndex(2)
+            self.private_key_label = QLabel("", self)
+            vbox.addWidget(self.private_key_label)
+            self.private_key_label.setVisible(False)
 
-    def show_encode_content(self):
-        self.stacked_widget.setCurrentIndex(1)
+            self.public_key_label = QLabel("", self)
+            vbox.addWidget(self.public_key_label)
+            self.public_key_label.setVisible(False)
+            self.browse_button = QPushButton('Browse', self)
+            self.browse_button.setFixedSize(100, 30)
+            vbox.addWidget(self.browse_button)
+            self.browse_button.setVisible(False)
 
-    def show_decode_content(self):
-        file_dialog = QFileDialog(self)
-        file_dialog.setWindowTitle("Select a file to decode")
-        file_dialog.setFileMode(QFileDialog.ExistingFiles)
-        if file_dialog.exec_():
-            file_names = file_dialog.selectedFiles()
-            print("Selected files:", file_names)
+            self.file_label = QLabel("", self)
+            vbox.addWidget(self.file_label)
+            self.file_label.setVisible(False)
+            self.performance_checkbox = QCheckBox('Record Performance', self)
+            vbox.addWidget(self.performance_checkbox)
+            self.performance_checkbox.setVisible(False)
+            self.save_button = QPushButton('Save', self)
+            self.save_button.setFixedSize(100, 30)
+            vbox.addWidget(self.save_button)
+            self.save_button.setVisible(False)
+            self.framework_combo_box.activated.connect(self.show_generate_key)
+            self.generate_button.clicked.connect(self.generate_key)
 
-    def update_algorithm_label(self, index):
-        algorithm = self.sender().currentText()
-        self.algorithm_label.setText(f'Selected algorithm: {algorithm}')
+    def decode_action(self):
+        if hasattr(self, 'algorithm_combo_box'):
+            self.algorithm_combo_box.deleteLater()
+            del self.algorithm_combo_box
+
+            self.encode_button_checked = False
+            if hasattr(self, 'browse_button'):
+                self.browse_button.setVisible(False)
+            if hasattr(self, 'file_label'):
+                self.file_label.setVisible(False)
+            if hasattr(self, 'private_key_label'):
+                self.private_key_label.setVisible(False)
+            if hasattr(self, 'public_key_label'):
+                self.public_key_label.setVisible(False)
+            if hasattr(self, 'performance_checkbox'):
+                self.performance_checkbox.setVisible(False)
+            if hasattr(self, 'generate_button'):
+                self.generate_button.setVisible(False)
+            if hasattr(self, 'framework_combo_box'):
+                self.framework_combo_box.setVisible(False)
+            if hasattr(self, 'save_button'):
+                self.save_button.setVisible(False)
+
+    def show_generate_key(self):
+        self.generate_button.setVisible(True)
+
+    def generate_key(self):
+        algorithm_name = self.algorithm_combo_box.currentText()
+        framework_name = self.framework_combo_box.currentText()
+
+        if algorithm_name == "AES" and framework_name == "PyCryptodome":
+            key = KeyGenerator.generate_aes_key()
+            self.private_key_label.setText("Generated AES key: " + key)
+            self.private_key_label.setVisible(True)
+        elif algorithm_name == "RSA" and framework_name == "PyCryptodome":
+            private_key, public_key = KeyGenerator.generate_rsa_key_pair()
+            self.private_key_label.setText("Generated RSA private key:\n" + private_key.decode("utf-8"))
+            self.private_key_label.setVisible(True)
+            self.public_key_label.setText("Generated RSA public key:\n" + public_key.decode("utf-8"))
+            self.public_key_label.setVisible(True)
+            self.browse_button.setVisible(True)
+            self.browse_button.clicked.connect(self.browse_files)
+            return public_key
+        self.browse_button.setVisible(True)
+        self.browse_button.clicked.connect(self.browse_files)
+
+    def browse_files(self):
+        file_path, _ = QFileDialog.getOpenFileName(self, "Select File")
+        if file_path:
+            self.selected_file_path = file_path
+            self.file_label.setText(f"Selected file: {file_path}")
+            self.file_label.setVisible(True)
+            self.performance_checkbox.setVisible(True)
+            self.save_button.setVisible(True)
+            self.save_button.clicked.connect(self.save_file)
+
+    def save_file(self):
+        algorithm_name = self.algorithm_combo_box.currentText()
+        framework_name = self.framework_combo_box.currentText()
+        file_path, _ = QFileDialog.getSaveFileName(self, "Save File", "", "All Files (*);;Text Files (*.txt)")
+        if file_path:
+            plaintext = "ok"  # de preluat din fisier
+
+            if algorithm_name == "AES" and framework_name == "PyCrypto":
+                key = KeyGenerator.generate_aes_key()
+                ciphertext = Cryptography.encrypt_aes(plaintext, key)
+
+            elif algorithm_name == "RSA" and framework_name == "PyCrypto":
+                public_key_pem = self.generate_key()
+                ciphertext = Cryptography.encrypt_rsa(plaintext, public_key_pem)
+                print(repr(ciphertext))
+
 
 if __name__ == '__main__':
     app = QApplication(sys.argv)
     dialog = MyDialog()
     dialog.show()
     sys.exit(app.exec_())
-
 
