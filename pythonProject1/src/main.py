@@ -2,7 +2,7 @@ import os
 import sys
 from PyQt5.QtWidgets import *
 
-from CryptoWrapper.CryptoWrapper import algRepo
+from CryptoWrapper.CryptoWrapper import algRepo, getAlgorithmByFramework
 from criptograpy_module.Cryptography import Cryptography
 from criptograpy_module.KeyGenerator import KeyGenerator
 
@@ -41,22 +41,22 @@ class MyDialog(QDialog):
             self.decode_button.setChecked(False)
             frameworks = set()
 
-            self.algorithm_combo_box = QComboBox(self)
+            vbox = self.layout()
             algorithms = algRepo.findAll()
             for algorithm in algorithms:
-                self.algorithm_combo_box.addItem(algorithm.name)
                 frameworks.add(algorithm.framework)
-            vbox = self.layout()
-            vbox.addWidget(self.algorithm_combo_box)
 
             self.framework_combo_box = QComboBox(self)
             for framework in frameworks:
                 self.framework_combo_box.addItem(framework)
             vbox.addWidget(self.framework_combo_box)
-            self.generate_button = QPushButton('Generate', self)
-            self.generate_button.setFixedSize(100, 30)
-            vbox.addWidget(self.generate_button)
-            self.generate_button.setVisible(False)
+
+            self.algorithm_combo_box = QComboBox(self)
+            algorithms = getAlgorithmByFramework(self.framework_combo_box.currentText())
+            for algorithm in algorithms:
+                self.algorithm_combo_box.addItem(algorithm.name)
+
+            vbox.addWidget(self.algorithm_combo_box)
 
             self.private_key_label = QLabel("", self)
             vbox.addWidget(self.private_key_label)
@@ -65,6 +65,12 @@ class MyDialog(QDialog):
             self.public_key_label = QLabel("", self)
             vbox.addWidget(self.public_key_label)
             self.public_key_label.setVisible(False)
+
+            self.generate_button = QPushButton('Generate', self)
+            self.generate_button.setFixedSize(100, 30)
+            vbox.addWidget(self.generate_button)
+            self.generate_button.setVisible(False)
+
             self.browse_button = QPushButton('Browse', self)
             self.browse_button.setFixedSize(100, 30)
             vbox.addWidget(self.browse_button)

@@ -22,6 +22,7 @@ def getFrameworks():
     return set(map(lambda x: x.framework, algRepo.findAll()))
 
 
+
 if __name__ == "__main__":
     print(algRepo.findAll())
     print(getAlgorithms())
