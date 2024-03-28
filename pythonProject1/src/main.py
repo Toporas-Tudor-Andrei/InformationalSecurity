@@ -115,10 +115,36 @@ class MyDialog(QDialog):
 
         if algorithm_name == "AES" and framework_name == "PyCryptodome":
             key = KeyGenerator.generate_aes_key()
-            self.private_key_label.setText("Generated AES key: " + key)
+            self.private_key_label.setText("Generated AES key: " + key.hex())
+            self.private_key_label.setVisible(True)
+        elif algorithm_name == "AES" and framework_name == "OpenSSL":
+            key = KeyGenerator.generate_aes_key()
+            self.private_key_label.setText("Generated AES key: " + key.hex())
+            self.private_key_label.setVisible(True)
+        elif algorithm_name == "AES" and framework_name == "Cryptography":
+            key = KeyGenerator.generate_aes_key()
+            self.private_key_label.setText("Generated AES key: " + key.hex())
             self.private_key_label.setVisible(True)
         elif algorithm_name == "RSA" and framework_name == "PyCryptodome":
-            private_key, public_key = KeyGenerator.generate_rsa_key_pair()
+            private_key, public_key = KeyGenerator.generate_rsa_key_pair() #sirul de octeti in sir de caractere unicode
+            self.private_key_label.setText("Generated RSA private key:\n" + private_key.decode("utf-8"))
+            self.private_key_label.setVisible(True)
+            self.public_key_label.setText("Generated RSA public key:\n" + public_key.decode("utf-8"))
+            self.public_key_label.setVisible(True)
+            self.browse_button.setVisible(True)
+            self.browse_button.clicked.connect(self.browse_files)
+            return public_key
+        elif algorithm_name == "RSA" and framework_name == "OpenSSL":
+            private_key, public_key = KeyGenerator.generate_rsa_key_pair() #sirul de octeti in sir de caractere unicode
+            self.private_key_label.setText("Generated RSA private key:\n" + private_key.decode("utf-8"))
+            self.private_key_label.setVisible(True)
+            self.public_key_label.setText("Generated RSA public key:\n" + public_key.decode("utf-8"))
+            self.public_key_label.setVisible(True)
+            self.browse_button.setVisible(True)
+            self.browse_button.clicked.connect(self.browse_files)
+            return public_key
+        elif algorithm_name == "RSA" and framework_name == "Cryptography":
+            private_key, public_key = KeyGenerator.generate_rsa_key_pair() #sirul de octeti in sir de caractere unicode
             self.private_key_label.setText("Generated RSA private key:\n" + private_key.decode("utf-8"))
             self.private_key_label.setVisible(True)
             self.public_key_label.setText("Generated RSA public key:\n" + public_key.decode("utf-8"))
