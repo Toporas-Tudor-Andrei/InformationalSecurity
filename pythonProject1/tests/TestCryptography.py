@@ -100,6 +100,8 @@ class TestEncryptionAdapter(unittest.TestCase):
         print(f"\nClass: {self.__class__.__name__}")
         self.plaintext = "Hello, this is a secret message."
         self.aes_key = KeyGenerator.generate_aes_key()
+        self.des3_key = KeyGenerator.generate_3des_key()
+        self.blowfish_key = KeyGenerator.generate_blowfish_key()
         self.private_key, self.public_key = KeyGenerator.generate_rsa_key_pair()
 
     def test_aes_encryption_decryption_openssl(self):
@@ -114,6 +116,18 @@ class TestEncryptionAdapter(unittest.TestCase):
         (time_performance, decrypted_text) = encryption_adapter.decrypt(ciphertext, self.private_key, 'RSA')
         self.assertEqual(decrypted_text, self.plaintext)
 
+    def test_3des_encryption_decryption_openssl(self):
+        encryption_adapter = EncryptionAdapter(OpenSSL)
+        (time_performance, ciphertext) = encryption_adapter.encrypt(self.plaintext, self.des3_key, 'DES')
+        (time_performance, decrypted_text) = encryption_adapter.decrypt(ciphertext, self.des3_key, 'DES')
+        self.assertEqual(decrypted_text, self.plaintext)
+
+    def test_bf_encryption_decryption_openssl(self):
+        encryption_adapter = EncryptionAdapter(OpenSSL)
+        (time_performance, ciphertext) = encryption_adapter.encrypt(self.plaintext, self.blowfish_key, 'BF')
+        (time_performance, decrypted_text) = encryption_adapter.decrypt(ciphertext, self.blowfish_key, 'BF')
+        self.assertEqual(decrypted_text, self.plaintext)
+
     def test_aes_encryption_decryption_cryptography(self):
         encryption_adapter = EncryptionAdapter(Cryptography)
         (time_performance, ciphertext) = encryption_adapter.encrypt(self.plaintext, self.aes_key, 'AES')
@@ -124,6 +138,18 @@ class TestEncryptionAdapter(unittest.TestCase):
         encryption_adapter = EncryptionAdapter(Cryptography)
         (time_performance, ciphertext) = encryption_adapter.encrypt(self.plaintext, self.public_key, 'RSA')
         (time_performance, decrypted_text) = encryption_adapter.decrypt(ciphertext, self.private_key, 'RSA')
+        self.assertEqual(decrypted_text, self.plaintext)
+
+    def test_3des_encryption_decryption_cryptography(self):
+        encryption_adapter = EncryptionAdapter(Cryptography)
+        (time_performance, ciphertext) = encryption_adapter.encrypt(self.plaintext, self.des3_key, 'DES')
+        (time_performance, decrypted_text) = encryption_adapter.decrypt(ciphertext, self.des3_key, 'DES')
+        self.assertEqual(decrypted_text, self.plaintext)
+
+    def test_bf_encryption_decryption_cryptography(self):
+        encryption_adapter = EncryptionAdapter(Cryptography)
+        (time_performance, ciphertext) = encryption_adapter.encrypt(self.plaintext, self.blowfish_key, 'BF')
+        (time_performance, decrypted_text) = encryption_adapter.decrypt(ciphertext, self.blowfish_key, 'BF')
         self.assertEqual(decrypted_text, self.plaintext)
 
     def test_aes_encryption_decryption_pycryptodome(self):
@@ -137,6 +163,19 @@ class TestEncryptionAdapter(unittest.TestCase):
         (time_performance, ciphertext) = encryption_adapter.encrypt(self.plaintext, self.public_key, 'RSA')
         (time_performance, decrypted_text) = encryption_adapter.decrypt(ciphertext, self.private_key, 'RSA')
         self.assertEqual(decrypted_text, self.plaintext)
+
+    def test_3des_encryption_decryption_pycryptodome(self):
+        encryption_adapter = EncryptionAdapter(PyCryptodome)
+        (time_performance, ciphertext) = encryption_adapter.encrypt(self.plaintext, self.des3_key, 'DES')
+        (time_performance, decrypted_text) = encryption_adapter.decrypt(ciphertext, self.des3_key, 'DES')
+        self.assertEqual(decrypted_text, self.plaintext)
+
+    def test_bf_encryption_decryption_pycryptodome(self):
+        encryption_adapter = EncryptionAdapter(PyCryptodome)
+        (time_performance, ciphertext) = encryption_adapter.encrypt(self.plaintext, self.blowfish_key, 'BF')
+        (time_performance, decrypted_text) = encryption_adapter.decrypt(ciphertext, self.blowfish_key, 'BF')
+        self.assertEqual(decrypted_text, self.plaintext)
+
 
 
 if __name__ == '__main__':

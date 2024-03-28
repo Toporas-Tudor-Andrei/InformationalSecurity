@@ -65,7 +65,7 @@ class OpenSSL:
         iv = b'\x00' * 8
         iv_hex = iv.hex()
         key_hex = key.hex()
-        openssl_cmd = f'echo -n "{plaintext}" | openssl enc -bf-cbc -base64 -K {key_hex} -iv {iv_hex}'
+        openssl_cmd = f'echo -n "{plaintext}" | openssl enc -bf-cbc -base64 -K {key_hex} -iv {iv_hex} -provider legacy'
         encrypted_text = b64decode(subprocess.check_output(openssl_cmd, shell=True))
         return iv + encrypted_text.strip()
 
@@ -77,7 +77,7 @@ class OpenSSL:
         iv_hex = iv.hex()
         key_hex = key.hex()
         ciphertext_data_hex = b64encode(ciphertext_data).decode('utf-8')
-        openssl_cmd = f'echo -n "{ciphertext_data_hex}" | base64 -d | openssl enc -d -bf-cbc -K {key_hex} -iv {iv_hex}'
+        openssl_cmd = f'echo -n "{ciphertext_data_hex}" | base64 -d | openssl enc -d -bf-cbc -K {key_hex} -iv {iv_hex} -provider legacy'
         decrypted_text = subprocess.check_output(openssl_cmd, shell=True).decode()
         return decrypted_text.strip()
 
