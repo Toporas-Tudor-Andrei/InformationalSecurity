@@ -18,8 +18,12 @@ def getAlgorithms():
 def getAlgorithmByFramework(name):
     return list(filter(lambda x: x.framework == name, algRepo.findAll()))
 
+def getFrameworks():
+    return set(map(lambda x: x.framework, algRepo.findAll()))
+
 
 if __name__ == "__main__":
     print(algRepo.findAll())
     print(getAlgorithms())
     print(getAlgorithmByFramework("OpenSSL"))
+    print(getFrameworks())
