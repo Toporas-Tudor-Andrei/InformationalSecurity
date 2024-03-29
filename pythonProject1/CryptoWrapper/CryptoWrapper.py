@@ -15,8 +15,9 @@ def getAlgorithms():
     return algRepo.findAll()
 
 
-def getAlgorithmByFramework(name):
-    return list(filter(lambda x: x.framework == name, algRepo.findAll()))
+def getAlgorithmByFramework(framework):
+    return algRepo.findAll(Algorithm.framework == framework)
+
 
 def getFrameworks():
     return set(map(lambda x: x.framework, algRepo.findAll()))
