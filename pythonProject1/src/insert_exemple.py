@@ -15,22 +15,22 @@ def delete_all_records():
 
 delete_all_records()
 
-algRepo.insert(Algorithm(id="1", name="AES", framework="OpenSSL", symetric=True))
-algRepo.insert(Algorithm(id="2", name="DES", framework="OpenSSL", symetric=True))
-algRepo.insert(Algorithm(id="3", name="BF", framework="OpenSSL", symetric=True))
-algRepo.insert(Algorithm(id="4", name="RSA", framework="OpenSSL", symetric=False))
+algRepo.insert(Algorithm(name="AES", framework="OpenSSL", symetric=True))
+algRepo.insert(Algorithm(name="DES", framework="OpenSSL", symetric=True))
+algRepo.insert(Algorithm(name="BF", framework="OpenSSL", symetric=True))
+algRepo.insert(Algorithm(name="RSA", framework="OpenSSL", symetric=False))
 
 
-algRepo.insert(Algorithm(id="5", name="AES", framework="PyCryptodome", symetric=True))
-algRepo.insert(Algorithm(id="6", name="DES", framework="PyCryptodome", symetric=True))
-algRepo.insert(Algorithm(id="7", name="BF", framework="PyCryptodome", symetric=True))
-algRepo.insert(Algorithm(id="8", name="RSA", framework="PyCryptodome", symetric=False))
+algRepo.insert(Algorithm(name="AES", framework="PyCryptodome", symetric=True))
+algRepo.insert(Algorithm(name="DES", framework="PyCryptodome", symetric=True))
+algRepo.insert(Algorithm(name="BF", framework="PyCryptodome", symetric=True))
+algRepo.insert(Algorithm(name="RSA", framework="PyCryptodome", symetric=False))
 
 
-algRepo.insert(Algorithm(id="9", name="AES", framework="Cryptography", symetric=True))
-algRepo.insert(Algorithm(id="10", name="DES", framework="Cryptography", symetric=True))
-algRepo.insert(Algorithm(id="11", name="BF", framework="Cryptography", symetric=True))
-algRepo.insert(Algorithm(id="12", name="RSA", framework="Cryptography", symetric=False))
+algRepo.insert(Algorithm(name="AES", framework="Cryptography", symetric=True))
+algRepo.insert(Algorithm(name="DES", framework="Cryptography", symetric=True))
+algRepo.insert(Algorithm(name="BF", framework="Cryptography", symetric=True))
+algRepo.insert(Algorithm(name="RSA", framework="Cryptography", symetric=False))
 
 
 

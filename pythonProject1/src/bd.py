@@ -76,7 +76,7 @@ class Repository:
 class Algorithm(Base):
     __tablename__ = 'algorithm'
 
-    id = Column(String, primary_key=True)
+    id = Column(Integer, primary_key=True, autoincrement="auto")
     name = Column(String, nullable=False)
     framework = Column(String, nullable=False)
     symetric = Column(Boolean, nullable=False)
@@ -91,7 +91,7 @@ class Algorithm(Base):
 class File(Base):
     __tablename__ = 'file'
 
-    id = Column(String, primary_key=True)
+    id = Column(Integer, primary_key=True, autoincrement="auto")
     hash = Column(String, nullable=False)
     bytes = Column(Integer, nullable=False)
     encrypted = Column(Boolean, nullable=False)
@@ -100,7 +100,7 @@ class File(Base):
 class Key(Base):
     __tablename__ = 'key'
 
-    id = Column(Integer, primary_key=True)
+    id = Column(Integer, primary_key=True, autoincrement="auto")
     file_id = Column(String, ForeignKey('file.id'), nullable=False)
     algorithm_id = Column(String, ForeignKey('algorithm.id'), nullable=False)
     isprivate = Column(Boolean, nullable=False)
@@ -113,7 +113,7 @@ class Key(Base):
 class PerformanceLogs(Base):
     __tablename__ = 'performance_logs'
 
-    id = Column(Integer, primary_key=True)
+    id = Column(Integer, primary_key=True, autoincrement="auto")
     encoding_time = Column(DateTime, nullable=False)
     decoding_time = Column(DateTime, nullable=False)
     file_id = Column(String, ForeignKey('file.id'), nullable=False)
