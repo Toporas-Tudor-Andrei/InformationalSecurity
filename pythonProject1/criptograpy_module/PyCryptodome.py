@@ -1,5 +1,5 @@
 import os
-from Crypto.Cipher import PKCS1_OAEP, AES, DES3, Blowfish
+from Crypto.Cipher import PKCS1_OAEP, AES, DES3, Blowfish, DES
 from Crypto.PublicKey import RSA
 from Crypto.Util import Padding
 from Performance.Decorators import *
@@ -10,69 +10,190 @@ class PyCryptodome:
     """
     @time_it
     @staticmethod
-    def encrypt_aes(plaintext, key):
-        if len(key) != 32:
-            raise ValueError("Key length must be 256 bits")
+    def encrypt_aes(plaintext, key, mode='ecb'):
+        valid_key_sizes = [128, 192, 256]
+        if (len(key) * 8) not in valid_key_sizes:
+            raise ValueError(f"Invalid key size for AES encryption. Choose from: {valid_key_sizes}")
 
-        iv = os.urandom(16)
-        cipher = AES.new(key, AES.MODE_CBC, iv)
+        if mode.lower() not in ['ecb', 'cbc', 'cfb', 'ofb']:
+            raise ValueError("Invalid mode. Supported modes are 'ecb', 'cbc', 'cfb', and 'ofb'")
+
+        if mode != 'ecb':
+            iv = os.urandom(16)
+        else:
+            iv = b''
+
+        if mode.lower() == 'ecb':
+            cipher = AES.new(key, AES.MODE_ECB)
+        elif mode.lower() == 'cbc':
+            cipher = AES.new(key, AES.MODE_CBC, iv)
+        elif mode.lower() == 'cfb':
+            cipher = AES.new(key, AES.MODE_CFB, iv)
+        elif mode.lower() == 'ofb':
+            cipher = AES.new(key, AES.MODE_OFB, iv)
+        else:
+            raise ValueError("Invalid mode. Supported modes are 'ecb', 'cbc', 'cfb', and 'ofb'.")
+
         padded_plaintext = Padding.pad(plaintext.encode(), AES.block_size)
         ciphertext = cipher.encrypt(padded_plaintext)
         return iv + ciphertext
 
     @time_it
     @staticmethod
-    def decrypt_aes(ciphertext, key):
-        if len(key) != 32:
-            raise ValueError("Key length must be 256 bits")
+    def decrypt_aes(ciphertext, key, mode='ecb'):
+        valid_key_sizes = [128, 192, 256]
+        if (len(key) * 8) not in valid_key_sizes:
+            raise ValueError(f"Invalid key size for AES encryption. Choose from: {valid_key_sizes}")
 
-        iv = ciphertext[:16]
-        ciphertext = ciphertext[16:]
-        cipher = AES.new(key, AES.MODE_CBC, iv)
-        decrypted_text = cipher.decrypt(ciphertext)
+        if mode.lower() not in ['ecb', 'cbc', 'cfb', 'ofb']:
+            raise ValueError("Invalid mode. Supported modes are 'ecb', 'cbc', 'cfb', and 'ofb'")
+
+        if mode != 'ecb':
+            iv = ciphertext[:16]
+            ciphertext_data = ciphertext[16:]
+        else:
+            iv = b''
+            ciphertext_data = ciphertext
+
+        if mode.lower() == 'ecb':
+            cipher = AES.new(key, AES.MODE_ECB)
+        elif mode.lower() == 'cbc':
+            cipher = AES.new(key, AES.MODE_CBC, iv)
+        elif mode.lower() == 'cfb':
+            cipher = AES.new(key, AES.MODE_CFB, iv)
+        elif mode.lower() == 'ofb':
+            cipher = AES.new(key, AES.MODE_OFB, iv)
+        else:
+            raise ValueError("Invalid mode. Supported modes are 'ecb', 'cbc', 'cfb', and 'ofb'.")
+
+        decrypted_text = cipher.decrypt(ciphertext_data)
         unpadded_text = Padding.unpad(decrypted_text, AES.block_size)
         return unpadded_text.decode()
 
     @time_it
     @staticmethod
-    def encrypt_3des(plaintext, key):
-        if len(key) != 24:
-            raise ValueError("Key length must be 64 bits")
+    def encrypt_des(plaintext, key, mode='ecb'):
+        valid_key_sizes = [64]
+        if (len(key) * 8) not in valid_key_sizes:
+            raise ValueError(f"Invalid key size for AES encryption. Choose from: {valid_key_sizes}")
 
-        iv = os.urandom(8)
-        cipher = DES3.new(key, DES3.MODE_CBC, iv)
-        padded_plaintext = Padding.pad(plaintext.encode(), DES3.block_size)
+        if mode.lower() not in ['ecb', 'cbc', 'cfb', 'ofb']:
+            raise ValueError("Invalid mode. Supported modes are 'ecb', 'cbc', 'cfb', and 'ofb'")
+
+
+        if mode != 'ecb':
+            iv = os.urandom(8)
+        else:
+            iv = b''
+
+        if mode.lower() == 'ecb':
+            cipher = DES.new(key, DES.MODE_ECB)
+        elif mode.lower() == 'cbc':
+            cipher = DES.new(key, DES.MODE_CBC, iv)
+        elif mode.lower() == 'cfb':
+            cipher = DES.new(key, DES.MODE_CFB, iv)
+        elif mode.lower() == 'ofb':
+            cipher = DES.new(key, DES.MODE_OFB, iv)
+        else:
+            raise ValueError("Invalid mode. Supported modes are 'ecb', 'cbc', 'cfb', and 'ofb'.")
+
+        padded_plaintext = Padding.pad(plaintext.encode(), DES.block_size)
         ciphertext = cipher.encrypt(padded_plaintext)
         return iv + ciphertext
 
     @time_it
     @staticmethod
-    def decrypt_3des(ciphertext, key):
-        if len(key) != 24:
-            raise ValueError("Key length must be 192 bits")
+    def decrypt_des(ciphertext, key, mode='ecb'):
+        valid_key_sizes = [64]
+        if (len(key) * 8) not in valid_key_sizes:
+            raise ValueError(f"Invalid key size for AES encryption. Choose from: {valid_key_sizes}")
 
-        iv = ciphertext[:8]
-        ciphertext = ciphertext[8:]
-        cipher = DES3.new(key, DES3.MODE_CBC, iv)
-        decrypted_text = cipher.decrypt(ciphertext)
-        unpadded_text = Padding.unpad(decrypted_text, DES3.block_size)
+        if mode.lower() not in ['ecb', 'cbc', 'cfb', 'ofb']:
+            raise ValueError("Invalid mode. Supported modes are 'ecb', 'cbc', 'cfb', and 'ofb'")
+
+        if mode != 'ecb':
+            iv = ciphertext[:8]
+            ciphertext_data = ciphertext[8:]
+        else:
+            iv = b''
+            ciphertext_data = ciphertext
+
+        if mode.lower() == 'ecb':
+            cipher = DES.new(key, DES.MODE_ECB)
+        elif mode.lower() == 'cbc':
+            cipher = DES.new(key, DES.MODE_CBC, iv)
+        elif mode.lower() == 'cfb':
+            cipher = DES.new(key, DES.MODE_CFB, iv)
+        elif mode.lower() == 'ofb':
+            cipher = DES.new(key, DES.MODE_OFB, iv)
+        else:
+            raise ValueError("Invalid mode. Supported modes are 'ecb', 'cbc', 'cfb', and 'ofb'.")
+
+        decrypted_text = cipher.decrypt(ciphertext_data)
+        unpadded_text = Padding.unpad(decrypted_text, DES.block_size)
         return unpadded_text.decode()
+
+
+
 
     @time_it
     @staticmethod
-    def encrypt_blowfish(plaintext, key):
-        iv = os.urandom(8)
-        cipher = Blowfish.new(key, Blowfish.MODE_CBC, iv)
+    def encrypt_bf(plaintext, key, mode='ecb'):
+        valid_key_sizes = [64, 128, 192, 256]
+        if (len(key) * 8) not in valid_key_sizes:
+            raise ValueError(f"Invalid key size for AES encryption. Choose from: {valid_key_sizes}")
+
+        if mode.lower() not in ['ecb', 'cbc', 'cfb', 'ofb']:
+            raise ValueError("Invalid mode. Supported modes are 'ecb', 'cbc', 'cfb', and 'ofb'")
+
+        if mode != 'ecb':
+            iv = os.urandom(8)
+        else:
+            iv = b''
+
+        if mode.lower() == 'ecb':
+            cipher = Blowfish.new(key, Blowfish.MODE_ECB)
+        elif mode.lower() == 'cbc':
+            cipher = Blowfish.new(key, Blowfish.MODE_CBC, iv)
+        elif mode.lower() == 'cfb':
+            cipher = Blowfish.new(key, Blowfish.MODE_CFB, iv)
+        elif mode.lower() == 'ofb':
+            cipher = Blowfish.new(key, Blowfish.MODE_OFB, iv)
+        else:
+            raise ValueError("Invalid mode. Supported modes are 'ecb', 'cbc', 'cfb', and 'ofb'.")
+
         padded_plaintext = Padding.pad(plaintext.encode(), Blowfish.block_size)
         ciphertext = cipher.encrypt(padded_plaintext)
         return iv + ciphertext
 
     @time_it
     @staticmethod
-    def decrypt_blowfish(ciphertext, key):
-        iv = ciphertext[:8]
-        ciphertext = ciphertext[8:]
-        cipher = Blowfish.new(key, Blowfish.MODE_CBC, iv)
+    def decrypt_bf(ciphertext, key, mode='ecb'):
+        valid_key_sizes = [64, 128, 192, 256]
+        if (len(key) * 8) not in valid_key_sizes:
+            raise ValueError(f"Invalid key size for AES encryption. Choose from: {valid_key_sizes}")
+
+        if mode.lower() not in ['ecb', 'cbc', 'cfb', 'ofb']:
+            raise ValueError("Invalid mode. Supported modes are 'ecb', 'cbc', 'cfb', and 'ofb'")
+
+        if mode != 'ecb':
+            iv = ciphertext[:8]
+            ciphertext_data = ciphertext[8:]
+        else:
+            iv = b''
+            ciphertext_data = ciphertext
+
+        if mode.lower() == 'ecb':
+            cipher = Blowfish.new(key, Blowfish.MODE_ECB)
+        elif mode.lower() == 'cbc':
+            cipher = Blowfish.new(key, Blowfish.MODE_CBC, iv)
+        elif mode.lower() == 'cfb':
+            cipher = Blowfish.new(key, Blowfish.MODE_CFB, iv)
+        elif mode.lower() == 'ofb':
+            cipher = Blowfish.new(key, Blowfish.MODE_OFB, iv)
+        else:
+            raise ValueError("Invalid mode. Supported modes are 'ecb', 'cbc', 'cfb', and 'ofb'.")
+
         decrypted_text = cipher.decrypt(ciphertext)
         unpadded_text = Padding.unpad(decrypted_text, Blowfish.block_size)
         return unpadded_text.decode()

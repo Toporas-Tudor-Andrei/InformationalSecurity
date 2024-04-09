@@ -53,7 +53,7 @@ if __name__ == "__main__":
     algorithms = ['AES', 'RSA']
     frameworks = [(Cryptography, "Cryptography"), (PyCryptodome, "PyCryptodome")]
 
-    aes_key = KeyGenerator.generate_aes_key()
+    aes_key = KeyGenerator.generate_256_key()
 
     rsa_private_key, rsa_public_key = KeyGenerator.generate_rsa_key_pair()
 

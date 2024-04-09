@@ -120,15 +120,15 @@ class MyDialog(QDialog):
         framework_name = self.framework_combo_box.currentText()
 
         if algorithm_name == "AES" and framework_name == "PyCryptodome":
-            key = KeyGenerator.generate_aes_key()
+            key = KeyGenerator.generate_256_key()
             self.private_key_label.setText("Generated AES key: " + key.hex())
             self.private_key_label.setVisible(True)
         elif algorithm_name == "AES" and framework_name == "OpenSSL":
-            key = KeyGenerator.generate_aes_key()
+            key = KeyGenerator.generate_256_key()
             self.private_key_label.setText("Generated AES key: " + key.hex())
             self.private_key_label.setVisible(True)
         elif algorithm_name == "AES" and framework_name == "Cryptography":
-            key = KeyGenerator.generate_aes_key()
+            key = KeyGenerator.generate_256_key()
             self.private_key_label.setText("Generated AES key: " + key.hex())
             self.private_key_label.setVisible(True)
         elif algorithm_name == "RSA" and framework_name == "PyCryptodome":
@@ -179,7 +179,7 @@ class MyDialog(QDialog):
             plaintext = "ok"  # de preluat din fisier
 
             if algorithm_name == "AES" and framework_name == "PyCrypto":
-                key = KeyGenerator.generate_aes_key()
+                key = KeyGenerator.generate_256_key()
                 ciphertext = Cryptography.encrypt_aes(plaintext, key)
 
             elif algorithm_name == "RSA" and framework_name == "PyCrypto":

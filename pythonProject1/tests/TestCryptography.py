@@ -10,9 +10,9 @@ class TestCryptography(unittest.TestCase):
     def setUp(self):
         print(f"\nClass: {self.__class__.__name__}")
         self.private_key, self.public_key = KeyGenerator.generate_rsa_key_pair()
-        self.aes_key = KeyGenerator.generate_aes_key()
-        self.des_key = KeyGenerator.generate_3des_key()
-        self.blowfish_key = KeyGenerator.generate_blowfish_key()
+        self.aes_key = KeyGenerator.generate_256_key()
+        self.des_key = KeyGenerator.generate_192_key()
+        self.blowfish_key = KeyGenerator.generate_64_key()
         self.plaintext = "Hello, this is a secret message."
 
     def test_rsa_encryption_decryption(self):
@@ -31,8 +31,8 @@ class TestCryptography(unittest.TestCase):
         self.assertEqual(decrypted_text, self.plaintext)
 
     def test_blowfish_encryption_decryption(self):
-        (time_performance, ciphertext) = Cryptography.encrypt_blowfish(self.plaintext, self.blowfish_key)
-        (time_performance, decrypted_text) = Cryptography.decrypt_blowfish(ciphertext, self.blowfish_key)
+        (time_performance, ciphertext) = Cryptography.encrypt_bf(self.plaintext, self.blowfish_key)
+        (time_performance, decrypted_text) = Cryptography.decrypt_bf(ciphertext, self.blowfish_key)
         self.assertEqual(decrypted_text, self.plaintext)
 
 
@@ -40,9 +40,9 @@ class TestPyCryptodome(unittest.TestCase):
     def setUp(self):
         print(f"\nClass: {self.__class__.__name__}")
         self.plaintext = "Hello, this is a secret message."
-        self.aes_key = KeyGenerator.generate_aes_key()
-        self.des_key = KeyGenerator.generate_3des_key()
-        self.blowfish_key = KeyGenerator.generate_blowfish_key()
+        self.aes_key = KeyGenerator.generate_256_key()
+        self.des_key = KeyGenerator.generate_64_key()
+        self.blowfish_key = KeyGenerator.generate_64_key()
         self.private_key, self.public_key = KeyGenerator.generate_rsa_key_pair()
 
     def test_aes_encryption_decryption(self):
@@ -51,8 +51,8 @@ class TestPyCryptodome(unittest.TestCase):
         self.assertEqual(decrypted_text, self.plaintext)
 
     def test_des_encryption_decryption(self):
-        (time_performance, ciphertext) = PyCryptodome.encrypt_3des(self.plaintext, self.des_key)
-        (time_performance, decrypted_text) = PyCryptodome.decrypt_3des(ciphertext, self.des_key)
+        (time_performance, ciphertext) = PyCryptodome.encrypt_des(self.plaintext, self.des_key)
+        (time_performance, decrypted_text) = PyCryptodome.decrypt_des(ciphertext, self.des_key)
         self.assertEqual(decrypted_text, self.plaintext)
 
     def test_rsa_encryption_decryption(self):
@@ -61,8 +61,8 @@ class TestPyCryptodome(unittest.TestCase):
         self.assertEqual(decrypted_text, self.plaintext)
 
     def test_blowfish_encryption_decryption(self):
-        (time_performance, ciphertext) = PyCryptodome.encrypt_blowfish(self.plaintext, self.blowfish_key)
-        (time_performance, decrypted_text) = PyCryptodome.decrypt_blowfish(ciphertext, self.blowfish_key)
+        (time_performance, ciphertext) = PyCryptodome.encrypt_bf(self.plaintext, self.blowfish_key)
+        (time_performance, decrypted_text) = PyCryptodome.decrypt_bf(ciphertext, self.blowfish_key)
         self.assertEqual(decrypted_text, self.plaintext)
 
 
@@ -70,9 +70,9 @@ class TestOpenSSL(unittest.TestCase):
     def setUp(self):
         print(f"\nClass: {self.__class__.__name__}")
         self.plaintext = "Hello, this is a secret message."
-        self.aes_key = KeyGenerator.generate_aes_key()
-        self.des3_key = KeyGenerator.generate_3des_key()
-        self.blowfish_key = KeyGenerator.generate_blowfish_key()
+        self.aes_key = KeyGenerator.generate_256_key()
+        self.des_key = KeyGenerator.generate_192_key()
+        self.blowfish_key = KeyGenerator.generate_64_key()
         self.private_key, self.public_key = KeyGenerator.generate_rsa_key_pair()
 
     def test_aes_encryption_decryption(self):
@@ -80,9 +80,9 @@ class TestOpenSSL(unittest.TestCase):
         (time_performance, decrypted_text) = OpenSSL.decrypt_aes(ciphertext, self.aes_key)
         self.assertEqual(decrypted_text, self.plaintext)
 
-    def test_des3_encryption_decryption(self):
-        (time_performance, ciphertext) = OpenSSL.encrypt_3des(self.plaintext, self.des3_key)
-        (time_performance, decrypted_text) = OpenSSL.decrypt_3des(ciphertext, self.des3_key)
+    def test_des_encryption_decryption(self):
+        (time_performance, ciphertext) = OpenSSL.encrypt_des(self.plaintext, self.blowfish_key)
+        (time_performance, decrypted_text) = OpenSSL.decrypt_des(ciphertext, self.blowfish_key)
         self.assertEqual(decrypted_text, self.plaintext)
 
     def test_rsa_encryption_decryption(self):
@@ -91,17 +91,18 @@ class TestOpenSSL(unittest.TestCase):
         self.assertEqual(decrypted_text, self.plaintext)
 
     def test_blowfish_encryption_decryption(self):
-        (time_performance, ciphertext) = OpenSSL.encrypt_blowfish(self.plaintext, self.blowfish_key)
-        (time_performance, decrypted_text) = OpenSSL.decrypt_blowfish(ciphertext, self.blowfish_key)
+        (time_performance, ciphertext) = OpenSSL.encrypt_bf(self.plaintext, self.blowfish_key)
+        (time_performance, decrypted_text) = OpenSSL.decrypt_bf(ciphertext, self.blowfish_key)
         self.assertEqual(decrypted_text, self.plaintext)
 
 class TestEncryptionAdapter(unittest.TestCase):
     def setUp(self):
         print(f"\nClass: {self.__class__.__name__}")
         self.plaintext = "Hello, this is a secret message."
-        self.aes_key = KeyGenerator.generate_aes_key()
-        self.des3_key = KeyGenerator.generate_3des_key()
-        self.blowfish_key = KeyGenerator.generate_blowfish_key()
+        self.aes_key = KeyGenerator.generate_256_key()
+        self.des3_key = KeyGenerator.generate_192_key()
+        self.des_key = KeyGenerator.generate_64_key()
+        self.blowfish_key = KeyGenerator.generate_64_key()
         self.private_key, self.public_key = KeyGenerator.generate_rsa_key_pair()
 
     def test_aes_encryption_decryption_openssl(self):
@@ -118,8 +119,8 @@ class TestEncryptionAdapter(unittest.TestCase):
 
     def test_3des_encryption_decryption_openssl(self):
         encryption_adapter = EncryptionAdapter(OpenSSL)
-        (time_performance, ciphertext) = encryption_adapter.encrypt(self.plaintext, self.des3_key, 'DES')
-        (time_performance, decrypted_text) = encryption_adapter.decrypt(ciphertext, self.des3_key, 'DES')
+        (time_performance, ciphertext) = encryption_adapter.encrypt(self.plaintext, self.des_key, 'DES')
+        (time_performance, decrypted_text) = encryption_adapter.decrypt(ciphertext, self.des_key, 'DES')
         self.assertEqual(decrypted_text, self.plaintext)
 
     def test_bf_encryption_decryption_openssl(self):
@@ -142,8 +143,8 @@ class TestEncryptionAdapter(unittest.TestCase):
 
     def test_3des_encryption_decryption_cryptography(self):
         encryption_adapter = EncryptionAdapter(Cryptography)
-        (time_performance, ciphertext) = encryption_adapter.encrypt(self.plaintext, self.des3_key, 'DES')
-        (time_performance, decrypted_text) = encryption_adapter.decrypt(ciphertext, self.des3_key, 'DES')
+        (time_performance, ciphertext) = encryption_adapter.encrypt(self.plaintext, self.des3_key, '3DES')
+        (time_performance, decrypted_text) = encryption_adapter.decrypt(ciphertext, self.des3_key, '3DES')
         self.assertEqual(decrypted_text, self.plaintext)
 
     def test_bf_encryption_decryption_cryptography(self):
@@ -166,8 +167,8 @@ class TestEncryptionAdapter(unittest.TestCase):
 
     def test_3des_encryption_decryption_pycryptodome(self):
         encryption_adapter = EncryptionAdapter(PyCryptodome)
-        (time_performance, ciphertext) = encryption_adapter.encrypt(self.plaintext, self.des3_key, 'DES')
-        (time_performance, decrypted_text) = encryption_adapter.decrypt(ciphertext, self.des3_key, 'DES')
+        (time_performance, ciphertext) = encryption_adapter.encrypt(self.plaintext, self.des_key, 'DES')
+        (time_performance, decrypted_text) = encryption_adapter.decrypt(ciphertext, self.des_key, 'DES')
         self.assertEqual(decrypted_text, self.plaintext)
 
     def test_bf_encryption_decryption_pycryptodome(self):

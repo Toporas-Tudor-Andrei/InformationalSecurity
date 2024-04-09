@@ -7,19 +7,24 @@ from cryptography.hazmat.primitives.asymmetric import rsa
 
 class KeyGenerator:
     @staticmethod
-    def generate_aes_key():
-        """Generate a 256-bit AES key"""
+    def generate_256_key():
+        """Generate a 256-bit key"""
         return os.urandom(32)
 
     @staticmethod
-    def generate_3des_key():
-        """Generate a 192-bit DES key"""
+    def generate_192_key():
+        """Generate a 192-bit key"""
         return os.urandom(24)
 
     @staticmethod
-    def generate_blowfish_key():
-        """Generate a 64-bit key"""
+    def generate_128_key():
+        """Generate a 128-bit key"""
         return os.urandom(16)
+
+    @staticmethod
+    def generate_64_key():
+        """Generate a 64-bit key"""
+        return os.urandom(8)
 
     @staticmethod
     def generate_rsa_key_pair():

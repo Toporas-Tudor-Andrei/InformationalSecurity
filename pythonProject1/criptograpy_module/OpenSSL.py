@@ -14,70 +14,120 @@ class OpenSSL:
 
     @time_it
     @staticmethod
-    def encrypt_aes(plaintext, key):
-        if len(key) * 8 != 256:
-            raise ValueError("Key length must be 256 bits")
-        iv = b'\x00' * 16
+    def encrypt_aes(plaintext, key, mode='ecb'):
+        valid_key_sizes = [128, 192, 256]
+        key_size = (len(key) * 8)
+        if key_size not in valid_key_sizes:
+            raise ValueError(f"Invalid key size for AES encryption. Choose from: {valid_key_sizes}")
+
+        if mode.lower() not in ['ecb', 'cbc', 'cfb', 'ofb']:
+            raise ValueError("Invalid mode. Supported modes are 'ecb', 'cbc', 'cfb', and 'ofb'")
+
+        iv = os.urandom(16)
+
         iv_hex = iv.hex()
         key_hex = key.hex()
-        openssl_cmd = f'echo -n "{plaintext}" | openssl enc -aes-256-cbc -base64 -K {key_hex} -iv {iv_hex}'
-        print(openssl_cmd)
+        openssl_cmd = f'echo -n "{plaintext}" | openssl enc -aes-{key_size}-{mode} -base64 -K {key_hex} -iv {iv_hex}'
         encrypted_text = b64decode(subprocess.check_output(openssl_cmd, shell=True))
         return iv + encrypted_text.strip()
 
     @time_it
     @staticmethod
-    def decrypt_aes(ciphertext, key):
+    def decrypt_aes(ciphertext, key, mode='ecb'):
+        valid_key_sizes = [128, 192, 256]
+        key_size = (len(key) * 8)
+        if key_size not in valid_key_sizes:
+            raise ValueError(f"Invalid key size for AES encryption. Choose from: {valid_key_sizes}")
+
+        if mode.lower() not in ['ecb', 'cbc', 'cfb', 'ofb']:
+            raise ValueError("Invalid mode. Supported modes are 'ecb', 'cbc', 'cfb', and 'ofb'")
+
         iv = ciphertext[:16]
         ciphertext_data = ciphertext[16:]
         iv_hex = iv.hex()
         key_hex = key.hex()
         ciphertext_data_hex = b64encode(ciphertext_data).decode('utf-8')
-        openssl_cmd = f'echo -n "{ciphertext_data_hex}" | base64 -d | openssl enc -d -aes-256-cbc -K {key_hex} -iv {iv_hex}'
+        openssl_cmd = f'echo -n "{ciphertext_data_hex}" | base64 -d | openssl enc -d -aes-{key_size}-{mode} -K {key_hex} -iv {iv_hex}'
         decrypted_text = subprocess.check_output(openssl_cmd, shell=True).decode()
         return decrypted_text.strip()
 
     @time_it
     @staticmethod
-    def encrypt_3des(plaintext, key):
-        iv = b'\x00' * 8
+    def encrypt_des(plaintext, key, mode='ecb'):
+        valid_key_sizes = [64]
+        key_size = (len(key) * 8)
+        if key_size not in valid_key_sizes:
+            raise ValueError(f"Invalid key size for AES encryption. Choose from: {valid_key_sizes}")
+
+        if mode.lower() not in ['ecb', 'cbc', 'cfb', 'ofb']:
+            raise ValueError("Invalid mode. Supported modes are 'ecb', 'cbc', 'cfb', and 'ofb'")
+
+        # Generate a random IV
+        iv = os.urandom(8)
+
         iv_hex = iv.hex()
         key_hex = key.hex()
-        openssl_cmd = f'echo -n "{plaintext}" | openssl enc -des3 -base64 -K {key_hex} -iv {iv_hex}'
+        openssl_cmd = f'echo -n "{plaintext}" | openssl enc -des-{mode} -base64 -K {key_hex} -iv {iv_hex} -provider legacy'
         encrypted_text = b64decode(subprocess.check_output(openssl_cmd, shell=True))
         return iv + encrypted_text.strip()
 
     @time_it
     @staticmethod
-    def decrypt_3des(ciphertext, key):
+    def decrypt_des(ciphertext, key, mode='ecb'):
+        valid_key_sizes = [64]
+        key_size = (len(key) * 8)
+        if key_size not in valid_key_sizes:
+            raise ValueError(f"Invalid key size for AES encryption. Choose from: {valid_key_sizes}")
+
+        if mode.lower() not in ['ecb', 'cbc', 'cfb', 'ofb']:
+            raise ValueError("Invalid mode. Supported modes are 'ecb', 'cbc', 'cfb', and 'ofb'")
+
         iv = ciphertext[:8]
         ciphertext_data = ciphertext[8:]
         iv_hex = iv.hex()
         key_hex = key.hex()
         ciphertext_data_hex = b64encode(ciphertext_data).decode('utf-8')
-        openssl_cmd = f'echo -n "{ciphertext_data_hex}" | base64 -d | openssl enc -d -des3 -K {key_hex} -iv {iv_hex}'
+        openssl_cmd = f'echo -n "{ciphertext_data_hex}" | base64 -d | openssl enc -d -des-{mode} -K {key_hex} -iv {iv_hex} -provider legacy'
         decrypted_text = subprocess.check_output(openssl_cmd, shell=True).decode()
         return decrypted_text.strip()
 
     @time_it
     @staticmethod
-    def encrypt_blowfish(plaintext, key):
-        iv = b'\x00' * 8
+    def encrypt_bf(plaintext, key, mode='ecb'):
+        valid_key_sizes = [64, 128, 192, 256]
+        key_size = (len(key) * 8)
+        if key_size not in valid_key_sizes:
+            raise ValueError(f"Invalid key size for AES encryption. Choose from: {valid_key_sizes}")
+
+        if mode.lower() not in ['ecb', 'cbc', 'cfb', 'ofb']:
+            raise ValueError("Invalid mode. Supported modes are 'ecb', 'cbc', 'cfb', and 'ofb'")
+
+        # Generate a random IV
+        iv = os.urandom(8)
+
         iv_hex = iv.hex()
         key_hex = key.hex()
-        openssl_cmd = f'echo -n "{plaintext}" | openssl enc -bf-cbc -base64 -K {key_hex} -iv {iv_hex} -provider legacy'
+        openssl_cmd = f'echo -n "{plaintext}" | openssl enc -bf-{mode} -base64 -K {key_hex} -iv {iv_hex} -provider legacy'
         encrypted_text = b64decode(subprocess.check_output(openssl_cmd, shell=True))
         return iv + encrypted_text.strip()
 
     @time_it
     @staticmethod
-    def decrypt_blowfish(ciphertext, key):
+    def decrypt_bf(ciphertext, key, mode='ecb'):
+        valid_key_sizes = [64, 128, 192, 256]
+        key_size = (len(key) * 8)
+        if key_size not in valid_key_sizes:
+            raise ValueError(f"Invalid key size for AES encryption. Choose from: {valid_key_sizes}")
+
+        if mode.lower() not in ['ecb', 'cbc', 'cfb', 'ofb']:
+            raise ValueError("Invalid mode. Supported modes are 'ecb', 'cbc', 'cfb', and 'ofb'")
+
         iv = ciphertext[:8]
         ciphertext_data = ciphertext[8:]
         iv_hex = iv.hex()
         key_hex = key.hex()
         ciphertext_data_hex = b64encode(ciphertext_data).decode('utf-8')
-        openssl_cmd = f'echo -n "{ciphertext_data_hex}" | base64 -d | openssl enc -d -bf-cbc -K {key_hex} -iv {iv_hex} -provider legacy'
+        openssl_cmd = f'echo -n "{ciphertext_data_hex}" | base64 -d | openssl enc -d -bf-{mode} -K {key_hex} -iv {iv_hex} -provider legacy'
         decrypted_text = subprocess.check_output(openssl_cmd, shell=True).decode()
         return decrypted_text.strip()
 
@@ -109,7 +159,6 @@ class OpenSSL:
 
         return encrypted_text
 
-
     @time_it
     @staticmethod
     def decrypt_rsa(ciphertext, private_key):
@@ -122,6 +171,7 @@ class OpenSSL:
             temp_cipher_file.write(ciphertext)
             temp_cipher_file_name = temp_cipher_file.name
 
+        # The command rsautl was deprecated in version 3.0. Use 'pkeyutl' instead.
         openssl_cmd = f'openssl pkeyutl -decrypt -in {temp_cipher_file_name} -inkey {temp_private_key_file_name} -out decrypted_text.txt'
         subprocess.run(openssl_cmd, shell=True, check=True)
 
