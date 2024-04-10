@@ -3,7 +3,7 @@ from criptograpy_module.KeyGenerator import KeyGenerator
 from criptograpy_module.Cryptography import Cryptography
 from criptograpy_module.OpenSSL import OpenSSL
 from criptograpy_module.PyCryptodome import PyCryptodome
-from criptograpy_module.EncryptionAdapter import EncryptionAdapter
+from criptograpy_module.Adaptors import SymmetricEncryptionAdapter, AsymmetricEncryptionAdapter
 
 
 class TestCryptography(unittest.TestCase):
@@ -106,73 +106,73 @@ class TestEncryptionAdapter(unittest.TestCase):
         self.private_key, self.public_key = KeyGenerator.generate_rsa_key_pair()
 
     def test_aes_encryption_decryption_openssl(self):
-        encryption_adapter = EncryptionAdapter(OpenSSL)
+        encryption_adapter = SymmetricEncryptionAdapter(OpenSSL)
         (time_performance, ciphertext) = encryption_adapter.encrypt(self.plaintext, self.aes_key, 'AES')
         (time_performance, decrypted_text) = encryption_adapter.decrypt(ciphertext, self.aes_key, 'AES')
         self.assertEqual(decrypted_text, self.plaintext)
 
     def test_rsa_encryption_decryption_openssl(self):
-        encryption_adapter = EncryptionAdapter(OpenSSL)
+        encryption_adapter = AsymmetricEncryptionAdapter(OpenSSL)
         (time_performance, ciphertext) = encryption_adapter.encrypt(self.plaintext, self.public_key, 'RSA')
         (time_performance, decrypted_text) = encryption_adapter.decrypt(ciphertext, self.private_key, 'RSA')
         self.assertEqual(decrypted_text, self.plaintext)
 
     def test_3des_encryption_decryption_openssl(self):
-        encryption_adapter = EncryptionAdapter(OpenSSL)
+        encryption_adapter = SymmetricEncryptionAdapter(OpenSSL)
         (time_performance, ciphertext) = encryption_adapter.encrypt(self.plaintext, self.des_key, 'DES')
         (time_performance, decrypted_text) = encryption_adapter.decrypt(ciphertext, self.des_key, 'DES')
         self.assertEqual(decrypted_text, self.plaintext)
 
     def test_bf_encryption_decryption_openssl(self):
-        encryption_adapter = EncryptionAdapter(OpenSSL)
+        encryption_adapter = SymmetricEncryptionAdapter(OpenSSL)
         (time_performance, ciphertext) = encryption_adapter.encrypt(self.plaintext, self.blowfish_key, 'BF')
         (time_performance, decrypted_text) = encryption_adapter.decrypt(ciphertext, self.blowfish_key, 'BF')
         self.assertEqual(decrypted_text, self.plaintext)
 
     def test_aes_encryption_decryption_cryptography(self):
-        encryption_adapter = EncryptionAdapter(Cryptography)
+        encryption_adapter = SymmetricEncryptionAdapter(Cryptography)
         (time_performance, ciphertext) = encryption_adapter.encrypt(self.plaintext, self.aes_key, 'AES')
         (time_performance, decrypted_text) = encryption_adapter.decrypt(ciphertext, self.aes_key, 'AES')
         self.assertEqual(decrypted_text, self.plaintext)
 
     def test_rsa_encryption_decryption_cryptography(self):
-        encryption_adapter = EncryptionAdapter(Cryptography)
+        encryption_adapter = AsymmetricEncryptionAdapter(Cryptography)
         (time_performance, ciphertext) = encryption_adapter.encrypt(self.plaintext, self.public_key, 'RSA')
         (time_performance, decrypted_text) = encryption_adapter.decrypt(ciphertext, self.private_key, 'RSA')
         self.assertEqual(decrypted_text, self.plaintext)
 
     def test_3des_encryption_decryption_cryptography(self):
-        encryption_adapter = EncryptionAdapter(Cryptography)
+        encryption_adapter = SymmetricEncryptionAdapter(Cryptography)
         (time_performance, ciphertext) = encryption_adapter.encrypt(self.plaintext, self.des3_key, '3DES')
         (time_performance, decrypted_text) = encryption_adapter.decrypt(ciphertext, self.des3_key, '3DES')
         self.assertEqual(decrypted_text, self.plaintext)
 
     def test_bf_encryption_decryption_cryptography(self):
-        encryption_adapter = EncryptionAdapter(Cryptography)
+        encryption_adapter = SymmetricEncryptionAdapter(Cryptography)
         (time_performance, ciphertext) = encryption_adapter.encrypt(self.plaintext, self.blowfish_key, 'BF')
         (time_performance, decrypted_text) = encryption_adapter.decrypt(ciphertext, self.blowfish_key, 'BF')
         self.assertEqual(decrypted_text, self.plaintext)
 
     def test_aes_encryption_decryption_pycryptodome(self):
-        encryption_adapter = EncryptionAdapter(PyCryptodome)
+        encryption_adapter = SymmetricEncryptionAdapter(PyCryptodome)
         (time_performance, ciphertext) = encryption_adapter.encrypt(self.plaintext, self.aes_key, 'AES')
         (time_performance, decrypted_text) = encryption_adapter.decrypt(ciphertext, self.aes_key, 'AES')
         self.assertEqual(decrypted_text, self.plaintext)
 
     def test_rsa_encryption_decryption_pycryptodome(self):
-        encryption_adapter = EncryptionAdapter(PyCryptodome)
+        encryption_adapter = AsymmetricEncryptionAdapter(PyCryptodome)
         (time_performance, ciphertext) = encryption_adapter.encrypt(self.plaintext, self.public_key, 'RSA')
         (time_performance, decrypted_text) = encryption_adapter.decrypt(ciphertext, self.private_key, 'RSA')
         self.assertEqual(decrypted_text, self.plaintext)
 
     def test_3des_encryption_decryption_pycryptodome(self):
-        encryption_adapter = EncryptionAdapter(PyCryptodome)
+        encryption_adapter = SymmetricEncryptionAdapter(PyCryptodome)
         (time_performance, ciphertext) = encryption_adapter.encrypt(self.plaintext, self.des_key, 'DES')
         (time_performance, decrypted_text) = encryption_adapter.decrypt(ciphertext, self.des_key, 'DES')
         self.assertEqual(decrypted_text, self.plaintext)
 
     def test_bf_encryption_decryption_pycryptodome(self):
-        encryption_adapter = EncryptionAdapter(PyCryptodome)
+        encryption_adapter = SymmetricEncryptionAdapter(PyCryptodome)
         (time_performance, ciphertext) = encryption_adapter.encrypt(self.plaintext, self.blowfish_key, 'BF')
         (time_performance, decrypted_text) = encryption_adapter.decrypt(ciphertext, self.blowfish_key, 'BF')
         self.assertEqual(decrypted_text, self.plaintext)

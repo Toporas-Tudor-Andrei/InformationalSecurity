@@ -1,4 +1,4 @@
-from sqlalchemy import create_engine, Column, Integer, String, Boolean, ForeignKey, DateTime
+from sqlalchemy import create_engine, Column, Integer, String, Boolean, ForeignKey, Float
 from sqlalchemy.exc import DBAPIError
 from sqlalchemy.orm import declarative_base, sessionmaker, relationship
 import os
@@ -72,20 +72,28 @@ class Repository:
         self.session.query(self.__model).delete()
         self.session.commit()
 
+    @operation
+    def getLastId(self):
+        # Get the ID of the last inserted record from the Algorithm table
+        last_id = self.session.query(self.__model.id).order_by(self.__model.id.desc()).first()
+        return last_id[0] if last_id else None
 
 class Algorithm(Base):
     __tablename__ = 'algorithm'
 
-    id = Column(Integer, primary_key=True, autoincrement="auto")
+    id = Column(Integer, primary_key=True, autoincrement=True)
     name = Column(String, nullable=False)
     framework = Column(String, nullable=False)
     symetric = Column(Boolean, nullable=False)
+    mode = Column(String, nullable=True) # For rsa can be nullable
+    key_len = Column(Integer, nullable=True)
 
     def __str__(self):
-        return f"{{\nid={self.id},\nname={self.name},\nframework={self.framework},\nsymetric={self.symetric}\n}}"
+        return f"{{\nid={self.id},\nname={self.name},\nframework={self.framework},\nsymmetric={self.symetric},\nmode={self.mode},\nkey_len={self.key_len}\n}}"
 
     def __repr__(self):
         return self.__str__().replace("\n", "")
+
 
 
 class File(Base):
@@ -114,8 +122,8 @@ class PerformanceLogs(Base):
     __tablename__ = 'performance_logs'
 
     id = Column(Integer, primary_key=True, autoincrement="auto")
-    encoding_time = Column(DateTime, nullable=False)
-    decoding_time = Column(DateTime, nullable=False)
+    encoding_time = Column(Float, nullable=False)
+    decoding_time = Column(Float, nullable=False)
     file_id = Column(String, ForeignKey('file.id'), nullable=False)
     algorithm_id = Column(String, ForeignKey('algorithm.id'), nullable=False)
 
