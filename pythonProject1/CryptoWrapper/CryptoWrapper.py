@@ -140,6 +140,125 @@ def encode_with_performance_measurment_simetric(plaintext, framework, algorithm,
     (time_performance_dec, decrypted_text) = encryption_adapter.decrypt(ciphertext, key, algorithm, mode)
     perfRepo.insert(PerformanceLogs(encoding_time=time_performance_enc, decoding_time=time_performance_dec, file_id=id_file, algorithm_id=algorithm_id))
 
+    # 4. Returns the ciphertext to be saved in the chosen location
+    return ciphertext
+
+
+def decode_ciphertext_simetric(ciphertext):
+    """
+    Functie de apelat la decoding cu algoritm simetric(aes, des, bf)
+    Returns plain text only if the hash of cyphertext is found in the file table (the app was used for encoding it first) + decription key used (pentru afisare pe interfata)
+    """
+    # 1. Search for file hash
+    cipherfile  = fileRepo.findAll(File.hash == calculate_sha256_hash(ciphertext))
+    if len(cipherfile) == 0:
+        raise ValueError("The file was not encrypted with our app. No decryption keys were found.")
+    cipherfile =cipherfile[0]
+
+    # 2. Search decryption key for file in keys table
+    decription_key_reg = keyRepo.findAll(Key.file_id == cipherfile.id)[0]
+    algorithm_id = decription_key_reg.algorithm_id
+
+    # 3. Search for algorithm name and mode by id
+    algorithm_reg = algRepo.findAll(Algorithm.id == algorithm_id)[0]
+
+    framework = algorithm_reg.framework
+
+    if framework.lower() == "openssl":
+        encryption_adapter = SymmetricEncryptionAdapter(OpenSSL)
+    elif framework.lower() == "pycryptodome":
+        encryption_adapter = SymmetricEncryptionAdapter(PyCryptodome)
+    elif framework.lower() == "cryptography":
+        encryption_adapter = SymmetricEncryptionAdapter(Cryptography)
+    else:
+        raise ValueError("Invalid framework specified.")
+
+    key = decription_key_reg.encryptionkey
+    algorithm = algorithm_reg.name
+    mode = algorithm_reg.mode
+
+    (time_performance_dec, decrypted_text) = encryption_adapter.decrypt(ciphertext, key, algorithm, mode)
+
+
+    print("Ciphertext decripted with key " + str(key) + "\n Plaintext: " + decrypted_text)
+    return (key, decrypted_text)
+
+def decode_ciphertext_asimetric(ciphertext):
+    """
+    Functie de apelat la decoding cu algoritm asimetric(rsa)
+    Returns plain text only if the hash of cyphertext is found in the file table (the app was used for encoding it first) + decription key used (pentru afisare pe interfata)
+    """
+    # 1. Search for file hash
+    cipherfile  = fileRepo.findAll(File.hash == calculate_sha256_hash(ciphertext))
+    if len(cipherfile) == 0:
+        raise ValueError("The file was not encrypted with our app. No decryption keys were found.")
+    cipherfile =cipherfile[0]
+
+    # 2. Search decryption key for file in keys table
+    decription_key_reg = keyRepo.findAll(Key.file_id == cipherfile.id)[0]
+    algorithm_id = decription_key_reg.algorithm_id
+
+    # 3. Search for algorithm name and mode by id
+    algorithm_reg = algRepo.findAll(Algorithm.id == algorithm_id)[0]
+
+    framework = algorithm_reg.framework
+
+    if framework.lower() == "openssl":
+        encryption_adapter = AsymmetricEncryptionAdapter(OpenSSL)
+    elif framework.lower() == "pycryptodome":
+        encryption_adapter = AsymmetricEncryptionAdapter(PyCryptodome)
+    elif framework.lower() == "cryptography":
+        encryption_adapter = AsymmetricEncryptionAdapter(Cryptography)
+    else:
+        raise ValueError("Invalid framework specified.")
+
+    key = decription_key_reg.encryptionkey
+    algorithm = algorithm_reg.name
+
+    (time_performance_dec, decrypted_text) = encryption_adapter.decrypt(ciphertext, key, algorithm)
+
+
+    print("Ciphertext decripted with key " + str(key) + "\n Plaintext: " + decrypted_text)
+    return (key, decrypted_text)
+
+def encode_with_performance_measurment_asimetric(plaintext, framework, algorithm, public_key, private_key):
+    """
+    Functie de apelat la encoding cu algoritm asimetric(rsa)
+    Returns cryptotext
+    Registeres encryption and decription performances in performance logs
+    """
+    if framework.lower() == "openssl":
+        encryption_adapter = AsymmetricEncryptionAdapter(OpenSSL)
+    elif framework.lower() == "pycryptodome":
+        encryption_adapter = AsymmetricEncryptionAdapter(PyCryptodome)
+    elif framework.lower() == "cryptography":
+        encryption_adapter = AsymmetricEncryptionAdapter(Cryptography)
+    else:
+        raise ValueError("Invalid framework specified.")
+
+    (time_performance_enc, ciphertext) = encryption_adapter.encrypt(plaintext, public_key, algorithm)
+
+    # 1. Register in file table
+    fileRepo.insert(File(hash=calculate_sha256_hash(plaintext), bytes=len(plaintext.encode('utf-8')), encrypted=False))
+    id_file = fileRepo.getLastId()
+    fileRepo.insert(File(hash=calculate_sha256_hash(ciphertext), bytes=len(plaintext.encode('utf-8')), encrypted=True))
+    id_encoded_file = fileRepo.getLastId()
+
+    # 2. Register in key table
+    algorithm_id = algRepo.findAll(Algorithm.framework == framework,
+                                   Algorithm.name == algorithm)[0].id
+
+    keyRepo.insert(Key(file_id=id_file, algorithm_id=algorithm_id, isprivate=False, encryptionkey=public_key))
+    keyRepo.insert(Key(file_id=id_encoded_file, algorithm_id=algorithm_id, isprivate=True, encryptionkey=private_key))
+
+    # 3. Register in performances table
+    (time_performance_dec, decrypted_text) = encryption_adapter.decrypt(ciphertext, private_key, algorithm)
+    perfRepo.insert(PerformanceLogs(encoding_time=time_performance_enc, decoding_time=time_performance_dec, file_id=id_file, algorithm_id=algorithm_id))
+
+    # 4. Returns the ciphertext to be saved in the chosen location
+    return ciphertext
+
+
 if __name__ == "__main__":
     print(algRepo.findAll())
     print(getAlgorithms())
@@ -161,5 +280,19 @@ if __name__ == "__main__":
     # encoding simetric
     plaintext = "Ana are mere."
     key = keyGen.generate_64_key()
-    encode_with_performance_measurment_simetric(plaintext, framework="OpenSSL", algorithm="DES", key= key, mode='cbc')
+    simetric_ciphertext = encode_with_performance_measurment_simetric(plaintext, framework="OpenSSL", algorithm="DES", key= key, mode='cbc')
+
+    # encoding asimetric
+    private_key, public_key = KeyGenerator.generate_rsa_key_pair()
+    asimetric_ciphertext = encode_with_performance_measurment_asimetric(plaintext, framework="OpenSSL", algorithm="RSA", public_key=public_key, private_key=private_key)
+
+    # decode simetric si asimetritic
+    key1, plaintext1 = decode_ciphertext_simetric(simetric_ciphertext)
+    print(plaintext1)
+
+    key2, plaintext2 = decode_ciphertext_asimetric(asimetric_ciphertext)
+    print(plaintext2)
+
+
+
 
