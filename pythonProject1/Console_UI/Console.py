@@ -1,6 +1,6 @@
 import time
 from criptograpy_module.Cryptography import Cryptography
-from criptograpy_module.EncryptionAdapter import EncryptionAdapter
+from criptograpy_module.Adaptors import SymmetricEncryptionAdapter, AsymmetricEncryptionAdapter
 from criptograpy_module.KeyGenerator import KeyGenerator
 from criptograpy_module.OpenSSL import OpenSSL
 from criptograpy_module.PyCryptodome import PyCryptodome
@@ -59,7 +59,7 @@ if __name__ == "__main__":
 
     for algorithm in algorithms:
         for framework, framework_name in frameworks:
-            adapter = EncryptionAdapter(framework)
+            adapter = AsymmetricEncryptionAdapter(framework)
 
             if algorithm == 'AES':
                 public_key = aes_key

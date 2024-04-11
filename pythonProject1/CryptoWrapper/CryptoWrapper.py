@@ -42,16 +42,18 @@ def getFrameworkByAlgorithm(algorithm):
     return set(map(lambda x: x.framework, algRepo.findAll(Algorithm.name == algorithm)))
 
 
-def perfData(fileId=None, /, *, alg=None, framework=None):
+def perfData(fileId=None, /, *, alg=None, framework=None, mode=None, keyLength=None):
     """
     Query function for finding the representative performance rows in the database
     :param fileId: filter parameter for finding a certain file's data
     :param alg: filter parameter for algorithm name
     :param framework: filter parameter for framework name
+    :param mode: filter parameter for the block encryption/decryption
+    :param keyLength: length of the encryption/decryption key
     :return: a list of PerformanceLogs objects corresponding to the filters given as parameters
     """
     filters = [getattr(Algorithm, col) == val for col, val in
-               [("name", alg), ("framework", framework)] if val is not None]
+               [("name", alg), ("framework", framework), ("mode", mode), ("key_len", keyLength)] if val is not None]
     ids = list(map(lambda it: it.id, algRepo.findAll(*filters)))
 
     file_cond = [getattr(PerformanceLogs, col) == val for col, val in
@@ -77,6 +79,9 @@ def logsProcessing(logs, operation, target):
         data = list(map(lambda it: it.encoding_time - it.decoding_time, logs))
     else:
         data = list(map(lambda it: it.encoding_time, logs))
+
+    if len(data) == 0:
+        return None
 
     if operation == "avg":
         return sum(data)/len(data)
@@ -280,19 +285,20 @@ if __name__ == "__main__":
     # encoding simetric
     plaintext = "Ana are mere."
     key = keyGen.generate_64_key()
-    simetric_ciphertext = encode_with_performance_measurment_simetric(plaintext, framework="OpenSSL", algorithm="DES", key= key, mode='cbc')
+    # simetric_ciphertext = encode_with_performance_measurment_simetric(plaintext, framework="OpenSSL", algorithm="DES", key= key, mode='cbc')
+    #
+    # # encoding asimetric
+    # private_key, public_key = KeyGenerator.generate_rsa_key_pair()
+    # asimetric_ciphertext = encode_with_performance_measurment_asimetric(plaintext, framework="OpenSSL", algorithm="RSA", public_key=public_key, private_key=private_key)
 
-    # encoding asimetric
-    private_key, public_key = KeyGenerator.generate_rsa_key_pair()
-    asimetric_ciphertext = encode_with_performance_measurment_asimetric(plaintext, framework="OpenSSL", algorithm="RSA", public_key=public_key, private_key=private_key)
+    # # decode simetric si asimetritic
+    # key1, plaintext1 = decode_ciphertext_simetric(simetric_ciphertext)
+    # print(plaintext1)
+    #
+    # key2, plaintext2 = decode_ciphertext_asimetric(asimetric_ciphertext)
+    # print(plaintext2)
 
-    # decode simetric si asimetritic
-    key1, plaintext1 = decode_ciphertext_simetric(simetric_ciphertext)
-    print(plaintext1)
-
-    key2, plaintext2 = decode_ciphertext_asimetric(asimetric_ciphertext)
-    print(plaintext2)
-
-
+    # exemplu apel perf data
+    print(logsProcessing(perfData(alg="AES", framework="OpenSSL"), "min", "enc"))
 
 
