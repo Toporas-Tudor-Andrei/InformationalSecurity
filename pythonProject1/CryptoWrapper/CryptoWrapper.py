@@ -285,20 +285,20 @@ if __name__ == "__main__":
     # encoding simetric
     plaintext = "Ana are mere."
     key = keyGen.generate_64_key()
-    # simetric_ciphertext = encode_with_performance_measurment_simetric(plaintext, framework="OpenSSL", algorithm="DES", key= key, mode='cbc')
-    #
-    # # encoding asimetric
-    # private_key, public_key = KeyGenerator.generate_rsa_key_pair()
-    # asimetric_ciphertext = encode_with_performance_measurment_asimetric(plaintext, framework="OpenSSL", algorithm="RSA", public_key=public_key, private_key=private_key)
+    simetric_ciphertext = encode_with_performance_measurment_simetric(plaintext, framework="PyCryptodome", algorithm="DES", key=key, mode='cbc')
 
-    # # decode simetric si asimetritic
-    # key1, plaintext1 = decode_ciphertext_simetric(simetric_ciphertext)
-    # print(plaintext1)
-    #
-    # key2, plaintext2 = decode_ciphertext_asimetric(asimetric_ciphertext)
-    # print(plaintext2)
+    # encoding asimetric
+    private_key, public_key = KeyGenerator.generate_rsa_key_pair()
+    asimetric_ciphertext = encode_with_performance_measurment_asimetric(plaintext, framework="PyCryptodome", algorithm="RSA", public_key=public_key, private_key=private_key)
+
+    # decode simetric si asimetritic
+    key1, plaintext1 = decode_ciphertext_simetric(simetric_ciphertext)
+    print(plaintext1)
+
+    key2, plaintext2 = decode_ciphertext_asimetric(asimetric_ciphertext)
+    print(plaintext2)
 
     # exemplu apel perf data
-    print(logsProcessing(perfData(alg="AES", framework="OpenSSL"), "min", "enc"))
+    print(logsProcessing(perfData(alg="DES", framework="PyCryptodome", mode="cbc", keyLength="64"), "avg", "enc"))
 
 
