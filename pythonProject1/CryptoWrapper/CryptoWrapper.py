@@ -297,6 +297,7 @@ if __name__ == "__main__":
     # print(plaintext2)
 
     # exemplu apel perf data
-    print(logsProcessing(perfData(alg="AES", framework="OpenSSL"), "min", "enc"))
+    print(logsProcessing(perfData(alg="DES", framework="OpenSSL"), "avr", "enc"))
+
 
 
