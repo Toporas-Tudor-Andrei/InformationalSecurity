@@ -42,16 +42,18 @@ def getFrameworkByAlgorithm(algorithm):
     return set(map(lambda x: x.framework, algRepo.findAll(Algorithm.name == algorithm)))
 
 
-def perfData(fileId=None, /, *, alg=None, framework=None):
+def perfData(fileId=None, /, *, alg=None, framework=None, mode=None, keyLength=None):
     """
     Query function for finding the representative performance rows in the database
     :param fileId: filter parameter for finding a certain file's data
     :param alg: filter parameter for algorithm name
     :param framework: filter parameter for framework name
+    :param mode: filter parameter for the block encryption/decryption
+    :param keyLength: length of the encryption/decryption key
     :return: a list of PerformanceLogs objects corresponding to the filters given as parameters
     """
     filters = [getattr(Algorithm, col) == val for col, val in
-               [("name", alg), ("framework", framework)] if val is not None]
+               [("name", alg), ("framework", framework), ("mode", mode), ("key_len", keyLength)] if val is not None]
     ids = list(map(lambda it: it.id, algRepo.findAll(*filters)))
 
     file_cond = [getattr(PerformanceLogs, col) == val for col, val in
