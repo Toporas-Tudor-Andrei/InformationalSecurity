@@ -100,7 +100,7 @@ def getAlgorithmModes(framework, algorithm):
     modes = set(entry.mode for entry in matching_entries if entry.mode)
     return list(modes)
 
-def getAlgorithmKeysLesngths(framework, algorithm):
+def getAlgorithmKeysLenghts(framework, algorithm):
     """
     Returns list of available key lengths for each pair of fw-algorithm
     """
@@ -279,7 +279,7 @@ if __name__ == "__main__":
     print(modes)
 
     # lista cu lungimile cheilor pt generare
-    keys = getAlgorithmKeysLesngths("OpenSSL", "AES")
+    keys = getAlgorithmKeysLenghts("OpenSSL", "AES")
     print(keys)
 
     # encoding simetric

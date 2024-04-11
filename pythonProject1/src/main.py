@@ -5,10 +5,10 @@ from PyQt5.QtGui import *
 from PyQt5.QtCore import *
 import sys
 
-from pythonProject1.CryptoWrapper.CryptoWrapper import getAlgorithms, getFrameworks, getFrameworkByAlgorithm, \
-    getAlgorithmByFramework, getAlgorithmKeysLesngths, getAlgorithmModes, encode_with_performance_measurment_simetric, \
-    encode_with_performance_measurment_asimetric
-from pythonProject1.criptograpy_module.KeyGenerator import KeyGenerator
+from CryptoWrapper.CryptoWrapper import encode_with_performance_measurment_simetric, \
+    encode_with_performance_measurment_asimetric, getFrameworks, getAlgorithmModes, getAlgorithmByFramework, \
+    getAlgorithmKeysLenghts
+from criptograpy_module.KeyGenerator import KeyGenerator
 
 
 class EncodePage(QWidget):
@@ -81,14 +81,14 @@ class EncodePage(QWidget):
         plaintext = self.selected_file_content
         framework = self.framework_combo.currentText()
         algorithm = self.algorithm_combo.currentText()
-        key1 = self.private_key_label.text()
+        key1 = bytes.fromhex(self.private_key_label.text())
         mode = self.mode_combo.currentText()
         print(algorithm)
         try:
             if algorithm != 'RSA':
                 ciphertext = encode_with_performance_measurment_simetric(plaintext, framework, algorithm, key1, mode)
             else:
-                key2 = self.public_key_label.text()
+                key2 = bytes.fromhex(self.public_key_label.text())
                 ciphertext = encode_with_performance_measurment_asimetric(plaintext, framework, algorithm, key2, key1)
 
             print("Key 1:", key1)
@@ -98,7 +98,7 @@ class EncodePage(QWidget):
 
             file_path, _ = QFileDialog.getSaveFileName(self, 'Save File')
             if file_path:
-                with open(file_path, 'w') as file:
+                with open(file_path, 'wb') as file:
                     file.write(ciphertext)
         except Exception as e:
             print("An error occurred:", e)
@@ -212,7 +212,7 @@ class EncodePage(QWidget):
         self.key_length_combo.clear()
         framework = self.framework_combo.currentText()
         algorithm_name = self.algorithm_combo.currentText()
-        key_lengths = getAlgorithmKeysLesngths(framework, algorithm_name)
+        key_lengths = getAlgorithmKeysLenghts(framework, algorithm_name)
         key_lengths = sorted(map(int, key_lengths))
         key_lengths = list(map(str, key_lengths))
         self.key_length_combo.addItems(key_lengths)
@@ -320,7 +320,7 @@ class Window(QMainWindow):
 
         encode_button = QPushButton(self)
         pixmap_encode = QPixmap(
-            "C:/Users/andra/Desktop/AN IV/sem 2/SI/InformationalSecurity/pythonProject1/assets/encode.png")
+            "../assets/encode.png")
         encode_button.setIcon(QIcon(pixmap_encode))
         encode_button.setIconSize(pixmap_encode.size())
         encode_button.setFixedSize(100, 100)
@@ -339,7 +339,7 @@ class Window(QMainWindow):
 
         decode_button = QPushButton(self)
         pixmap_decode = QPixmap(
-            "C:/Users/andra/Desktop/AN IV/sem 2/SI/InformationalSecurity/pythonProject1/assets/decode.png")
+            "../assets/decode.png")
         decode_button.setIcon(QIcon(pixmap_decode))
         decode_button.setIconSize(pixmap_decode.size())
         decode_button.setFixedSize(100, 100)
