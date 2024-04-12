@@ -5,10 +5,10 @@ from PyQt5.QtGui import *
 from PyQt5.QtCore import *
 import sys
 
-from CryptoWrapper.CryptoWrapper import encode_with_performance_measurment_simetric, \
+from pythonProject1.CryptoWrapper.CryptoWrapper import encode_with_performance_measurment_simetric, \
     encode_with_performance_measurment_asimetric, getFrameworks, getAlgorithmModes, getAlgorithmByFramework, \
-    getAlgorithmKeysLenghts
-from criptograpy_module.KeyGenerator import KeyGenerator
+    getAlgorithmKeysLenghts, decode_ciphertext_simetric
+from pythonProject1.criptograpy_module.KeyGenerator import KeyGenerator
 
 
 class EncodePage(QWidget):
@@ -97,6 +97,7 @@ class EncodePage(QWidget):
             print("Ciphertext:", ciphertext)
 
             file_path, _ = QFileDialog.getSaveFileName(self, 'Save File')
+            print("Cybertext_scris", ciphertext)
             if file_path:
                 with open(file_path, 'wb') as file:
                     file.write(ciphertext)
@@ -250,6 +251,7 @@ class DecodePage(QWidget):
     def __init__(self, parent=None):
         super().__init__(parent)
 
+        self.selected_file_content2 = None
         layout = QVBoxLayout()
         self.group_box = QGroupBox()
         self.group_box.setMaximumHeight(100)
@@ -269,6 +271,10 @@ class DecodePage(QWidget):
         self.label.dragEnterEvent = self.drag_enter_event
         self.label.dropEvent = self.drop_event
 
+        self.save_button = QPushButton('Save Decrypted File')
+        self.save_button.clicked.connect(self.save_decrypted_file)
+        layout.addWidget(self.save_button)
+
         back_button = QPushButton('Back')
         back_button.clicked.connect(self.parent().back_to_main)
 
@@ -281,9 +287,9 @@ class DecodePage(QWidget):
             file_info = QFileInfo(filename)
             file_icon = QFileIconProvider().icon(file_info)
             self.file_icon_label.setPixmap(file_icon.pixmap(40, 40))
-
             self.label.setText(f'{file_info.fileName()}')
-
+            with open(filename, 'rb') as file:
+                self.selected_file_content2 = file.read()
     def drag_enter_event(self, event):
         if event.mimeData().hasUrls():
             event.acceptProposedAction()
@@ -298,6 +304,16 @@ class DecodePage(QWidget):
                 file_icon = QFileIconProvider().icon(file_info)
                 self.file_icon_label.setPixmap(file_icon.pixmap(40, 40))
                 self.label.setText(file_info.fileName())
+
+    def save_decrypted_file(self):
+        try:
+            key, plaintext = decode_ciphertext_simetric(self.selected_file_content2)
+            file_path, _ = QFileDialog.getSaveFileName(self, 'Save File')
+            if file_path:
+                with open(file_path, 'w') as file:
+                    file.write(plaintext)
+        except Exception as e:
+            print("An error occurred:", e)
 
 
 class Window(QMainWindow):
