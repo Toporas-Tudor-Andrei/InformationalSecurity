@@ -4,11 +4,16 @@ from PyQt5.QtWidgets import *
 from PyQt5.QtGui import *
 from PyQt5.QtCore import *
 import sys
+import os
+
+from sqlalchemy import create_engine
+from sqlalchemy.orm import sessionmaker
 
 from pythonProject1.CryptoWrapper.CryptoWrapper import encode_with_performance_measurment_simetric, \
     encode_with_performance_measurment_asimetric, getFrameworks, getAlgorithmModes, getAlgorithmByFramework, \
-    getAlgorithmKeysLenghts, decode_ciphertext_simetric
+    getAlgorithmKeysLenghts, decode_ciphertext_simetric, perfData, logsProcessing
 from pythonProject1.criptograpy_module.KeyGenerator import KeyGenerator
+from pythonProject1.src.bd import Algorithm, PerformanceLogs, Repository
 
 
 class EncodePage(QWidget):
@@ -41,8 +46,8 @@ class EncodePage(QWidget):
         self.public_key_label = QLineEdit(self)
         self.public_key_label.setVisible(False)
         self.algorithm_combo = QComboBox()
-#       self.symmetric_checkbox = QCheckBox("I want my algorithm symmetric")
-#        self.symmetric_checkbox.stateChanged.connect(self.update_symmetric_variable)
+        #       self.symmetric_checkbox = QCheckBox("I want my algorithm symmetric")
+        #        self.symmetric_checkbox.stateChanged.connect(self.update_symmetric_variable)
 
         self.framework_combo = QComboBox()
 
@@ -56,7 +61,7 @@ class EncodePage(QWidget):
         algorithm_layout = QHBoxLayout()
 
         algorithm_layout.addWidget(self.algorithm_combo)
-       # algorithm_layout.addWidget(self.symmetric_checkbox)
+        # algorithm_layout.addWidget(self.symmetric_checkbox)
         layout.addWidget(self.framework_combo)
         layout.addLayout(algorithm_layout)
         layout.addWidget(self.key_length_combo)
@@ -136,7 +141,6 @@ class EncodePage(QWidget):
             self.public_key_label.setText(public_key.decode("utf-8"))
             self.public_key_label.setVisible(True)
 
-
     def apply_styles(self):
         combobox_style = """
             QComboBox {
@@ -171,7 +175,7 @@ class EncodePage(QWidget):
                     image: url("C:/Users/andra/Desktop/AN IV/sem 2/SI/InformationalSecurity/pythonProject1/assets/select.png"); 
                 }
             """
-      #  self.symmetric_checkbox.setStyleSheet(checkbox_style)
+        #  self.symmetric_checkbox.setStyleSheet(checkbox_style)
         lineedit_style = """
                         QLineEdit {
                             border: 2px solid #808080; 
@@ -290,6 +294,7 @@ class DecodePage(QWidget):
             self.label.setText(f'{file_info.fileName()}')
             with open(filename, 'rb') as file:
                 self.selected_file_content2 = file.read()
+
     def drag_enter_event(self, event):
         if event.mimeData().hasUrls():
             event.acceptProposedAction()
@@ -314,6 +319,52 @@ class DecodePage(QWidget):
                     file.write(plaintext)
         except Exception as e:
             print("An error occurred:", e)
+
+
+class DBPage(QWidget):
+    def __init__(self, parent=None):
+        super().__init__(parent)
+
+        dbFolder = os.path.dirname(__file__)
+        self.engine = create_engine(f'sqlite:///{dbFolder}/database.db')
+        Session = sessionmaker(bind=self.engine)
+        self.session = Session()
+
+        layout = QVBoxLayout()
+
+        # Create table widget
+        self.table_widget = QTableWidget()
+        layout.addWidget(self.table_widget)
+
+        # Create back button
+        back_button = QPushButton('Back')
+        back_button.clicked.connect(self.parent().back_to_main)
+        layout.addWidget(back_button, alignment=Qt.AlignRight)
+
+        self.setLayout(layout)
+
+        # Populate table with database content
+        self.populate_table()
+
+    def populate_table(self):
+        perfRepo = Repository.of(PerformanceLogs)
+        logs = perfRepo.findAll()
+
+        print("Number of performance logs fetched:", len(logs))
+
+        headers = ['ID', 'Encoding Time', 'Decoding Time', 'File ID', 'Algorithm ID']
+        self.table_widget.setColumnCount(len(headers))
+        self.table_widget.setHorizontalHeaderLabels(headers)
+
+        self.table_widget.setRowCount(len(logs))
+        for row, log in enumerate(logs):
+            self.table_widget.setItem(row, 0, QTableWidgetItem(str(log.id)))
+            self.table_widget.setItem(row, 1, QTableWidgetItem(str(log.encoding_time)))
+            self.table_widget.setItem(row, 2, QTableWidgetItem(str(log.decoding_time)))
+            self.table_widget.setItem(row, 3, QTableWidgetItem(str(log.file_id)))
+            self.table_widget.setItem(row, 4, QTableWidgetItem(str(log.algorithm_id)))
+    def closeEvent(self, event):
+        self.session.close()
 
 
 class Window(QMainWindow):
@@ -368,10 +419,30 @@ class Window(QMainWindow):
 
         layout.addLayout(decode_layout)
 
-        main_page.setLayout(layout)
+        show_db_layout = QVBoxLayout()
+        show_db_layout.setAlignment(Qt.AlignCenter)
+        show_db_layout.setContentsMargins(0, 80, 0, 0)
+
+        show_db_button = QPushButton(self)
+        # pixmap_encode = QPixmap(
+        #     "../assets/encode.png")
+        # show_db_button.setIcon(QIcon(pixmap_encode))
+        show_db_button.setIconSize(pixmap_encode.size())
+        show_db_button.setFixedSize(100, 100)
+        show_db_layout.addWidget(show_db_button)
+
+        show_db_text_label = QLabel("Print DB", self)
+        show_db_text_label.setAlignment(Qt.AlignCenter)
+        show_db_layout.addWidget(show_db_text_label)
+        show_db_layout.addStretch()
+
+        layout.addLayout(show_db_layout)
 
         encode_button.clicked.connect(self.show_encode_page)
         decode_button.clicked.connect(self.show_decode_page)
+        show_db_button.clicked.connect(self.show_db_page)
+
+        main_page.setLayout(layout)
 
         self.stacked_widget.addWidget(main_page)
 
@@ -384,6 +455,11 @@ class Window(QMainWindow):
         decode_page = DecodePage(self)
         self.stacked_widget.addWidget(decode_page)
         self.stacked_widget.setCurrentWidget(decode_page)
+
+    def show_db_page(self):
+        db_page = DBPage(self)
+        self.stacked_widget.addWidget(db_page)
+        self.stacked_widget.setCurrentWidget(db_page)
 
     def back_to_main(self):
         self.stacked_widget.setCurrentIndex(0)
