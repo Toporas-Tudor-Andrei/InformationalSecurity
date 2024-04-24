@@ -92,6 +92,7 @@ class EncodePage(QWidget):
         print(algorithm)
         try:
             if algorithm != 'RSA':
+                self.parent().selected_algorithm = algorithm
                 ciphertext = encode_with_performance_measurment_simetric(plaintext, framework, algorithm, key1, mode)
             else:
                 self.parent().selected_algorithm = algorithm
@@ -298,7 +299,6 @@ class DecodePage(QWidget):
             self.file_icon_label.setPixmap(file_icon.pixmap(40, 40))
             self.label.setText(f'{file_info.fileName()}')
 
-            # Obține extensia fișierului
             self.selected_file_extension = file_info.suffix()
 
             with open(filename, 'rb') as file:
@@ -365,9 +365,13 @@ class PerformancesPage(QWidget):
         self.result_label = QLabel()
         layout.addWidget(self.result_label)
 
+
         self.calculate_button = QPushButton("Calculate")
         self.calculate_button.clicked.connect(self.calculate_performance)
         layout.addWidget(self.calculate_button)
+
+        self.table_widget = QTableWidget()
+        layout.addWidget(self.table_widget)
 
         back_button = QPushButton('Back')
         back_button.clicked.connect(self.parent().back_to_main)
@@ -377,6 +381,10 @@ class PerformancesPage(QWidget):
         self.setLayout(layout)
 
         self.apply_styles()
+
+        headers = ['ID', 'Encoding Time', 'Decoding Time', 'File ID', 'Algorithm ID', 'File Size']
+        self.table_widget.setColumnCount(len(headers))
+        self.table_widget.setHorizontalHeaderLabels(headers)
 
     def apply_styles(self):
         combobox_style = """
@@ -422,10 +430,38 @@ class PerformancesPage(QWidget):
         framework = self.framework_combo.currentText()
         mode = self.mode_combo.currentText()
         keyLength = self.key_length_combo.currentText()
-        print(target, operation, mode, keyLength, algorithm, framework)
-        performance_data = perfData(alg = algorithm, framework = framework,mode= mode,keyLength= keyLength)
+
+        performance_data = perfData(alg=algorithm, framework=framework, mode=mode, keyLength=keyLength)
         result = logsProcessing(performance_data, operation, target)
-        self.result_label.setText(f"Result: {result}")
+        if operation == "avg":
+            self.result_label.setText(f"Average: {result}")
+        elif operation == "min":
+            self.result_label.setText(f"Minimum: {result}")
+        elif operation == "max":
+            self.result_label.setText(f"Maximum: {result}")
+
+
+        self.update_performance_table(performance_data)
+
+    def update_performance_table(self, performance_data):
+        self.table_widget.clearContents()
+
+        num_rows = len(performance_data)
+        self.table_widget.setRowCount(num_rows)
+        num_cols = 6
+        self.table_widget.setColumnCount(num_cols)
+
+        for row, log in enumerate(performance_data):
+            self.table_widget.setItem(row, 0, QTableWidgetItem(str(log.id)))
+            self.table_widget.setItem(row, 1, QTableWidgetItem(str(log.encoding_time)))
+            self.table_widget.setItem(row, 2, QTableWidgetItem(str(log.decoding_time)))
+            self.table_widget.setItem(row, 3, QTableWidgetItem(str(log.file_id)))
+            self.table_widget.setItem(row, 4, QTableWidgetItem(str(log.algorithm_id)))
+            self.table_widget.setItem(row, 5, QTableWidgetItem(str(log.bytes)))
+
+
+        self.table_widget.resizeColumnsToContents()
+        self.table_widget.resizeRowsToContents()
     def populate_comboboxes(self):
         frameworks = getFrameworks()
         self.framework_combo.addItems(sorted(list(frameworks)))
@@ -458,6 +494,8 @@ class PerformancesPage(QWidget):
         key_lengths = sorted(map(int, key_lengths))
         key_lengths = list(map(str, key_lengths))
         self.key_length_combo.addItems(key_lengths)
+
+
 
 class Window(QMainWindow):
     def __init__(self):
@@ -527,11 +565,16 @@ class Window(QMainWindow):
         show_db_text_label.setAlignment(Qt.AlignCenter)
         show_db_layout.addWidget(show_db_text_label)
         show_db_layout.addStretch()
-
+        pixmap_perf = QPixmap(
+            "../assets/performance.png")
+        performances_button.setIcon(QIcon(pixmap_perf))
+        performances_button.setIconSize(pixmap_encode.size())
+        performances_button.setFixedSize(100, 100)
         layout.addLayout(show_db_layout)
 
         encode_button.clicked.connect(self.show_encode_page)
         decode_button.clicked.connect(self.show_decode_page)
+
         performances_button.clicked.connect(self.show_performances_page)
 
         main_page.setLayout(layout)
