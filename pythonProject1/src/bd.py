@@ -78,6 +78,10 @@ class Repository:
         last_id = self.session.query(self.__model.id).order_by(self.__model.id.desc()).first()
         return last_id[0] if last_id else None
 
+    @operation
+    def findAllJoinOn(self, joinModel, *args):
+        return self.session.execute(self.session.query(self.__model).add_entity(joinModel).join(joinModel).filter(*args)).fetchall()
+
 class Algorithm(Base):
     __tablename__ = 'algorithm'
 
@@ -130,5 +134,10 @@ class PerformanceLogs(Base):
     file = relationship('File')
     algorithm = relationship('Algorithm')
 
+    def __str__(self):
+        return f"{{\nid={self.id},\nencoding_time={self.encoding_time},\ndecoding_time={self.decoding_time},\nfile_id={self.file_id},\nalgorithm_id={self.algorithm_id}\n}}"
+
+    def __repr__(self):
+        return self.__str__().replace("\n", "")
 
 Base.metadata.create_all(engine)

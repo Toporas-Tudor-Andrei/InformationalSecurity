@@ -26,6 +26,20 @@ def calculate_sha256_hash(data):
 
     return sha256_hash
 
+def mergeObjectProperties(objectToMergeFrom, objectToMergeTo): # source: http://byatool.com/uncategorized/simple-property-merge-for-python-objects/
+    """
+    Used to copy properties from one object to another if there isn't a naming conflict;
+    """
+    for property in objectToMergeFrom.__dict__:
+        #Check to make sure it can't be called... ie a method.
+        #Also make sure the objectobjectToMergeTo doesn't have a property of the same name.
+        if not callable(objectToMergeFrom.__dict__[property]) and not hasattr(objectToMergeTo, property):
+            setattr(objectToMergeTo, property, getattr(objectToMergeFrom, property))
+        elif hasattr(objectToMergeTo, property):  # condition added by me :P
+            setattr(objectToMergeTo, property + "_new", getattr(objectToMergeFrom, property))
+
+    return objectToMergeTo
+
 def getAlgorithms():
     return algRepo.findAll()
 
@@ -59,7 +73,8 @@ def perfData(fileId=None, /, *, alg=None, framework=None, mode=None, keyLength=N
     file_cond = [getattr(PerformanceLogs, col) == val for col, val in
                  [("file_id", fileId)] if val is not None]
 
-    return perfRepo.findAll(*file_cond, PerformanceLogs.algorithm_id.in_(ids))
+    perf_file_data = perfRepo.findAllJoinOn(File, *file_cond, PerformanceLogs.algorithm_id.in_(ids))
+    return list(map(lambda it: mergeObjectProperties(it[1], it[0]), perf_file_data))
 
 
 def logsProcessing(logs, operation, target):
@@ -271,7 +286,8 @@ if __name__ == "__main__":
     print(getFrameworks())
     print(getFrameworkByAlgorithm("AES"))
     print(algRepo.findAll(Algorithm.name.in_(["AES", "DES"])))
-    print(perfData())
+    print("===========================HERE========================================")
+    print(perfData()[0].id_new)
     print(perfRepo.findAll())
 
     # lista cu moduri de rulare disponibile pt un alg
