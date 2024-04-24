@@ -136,9 +136,9 @@ class EncodePage(QWidget):
 
         else:
             private_key, public_key = KeyGenerator.generate_rsa_key_pair()
-            self.private_key_label.setText(private_key.decode("utf-8"))
+            self.private_key_label.setText(private_key.hex())
             self.private_key_label.setVisible(True)
-            self.public_key_label.setText(public_key.decode("utf-8"))
+            self.public_key_label.setText(public_key.hex())
             self.public_key_label.setVisible(True)
 
     def apply_styles(self):
