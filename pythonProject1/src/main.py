@@ -482,7 +482,6 @@ class PerformancesPage(QWidget):
         framework = self.framework_combo.currentText()
         algorithm_name = self.algorithm_combo.currentText()
         modes = getAlgorithmModes(framework, algorithm_name)
-        print("MODES", modes)
         self.mode_combo.addItems(sorted(modes))
 
     def update_algorithm_combo(self, index):
