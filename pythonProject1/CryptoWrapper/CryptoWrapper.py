@@ -101,9 +101,9 @@ def logsProcessing(logs, operation, target):
     if operation == "avg":
         return sum(data)/len(data)
     elif operation == "min":
-        min(data)
+        return min(data)
     elif operation == "max":
-        max(data)
+        return max(data)
     else:
         return data
 
