@@ -302,3 +302,4 @@ if __name__ == "__main__":
     print(logsProcessing(perfData(alg="DES", framework="PyCryptodome", mode="cbc", keyLength="64"), "avg", "enc"))
 
 
+

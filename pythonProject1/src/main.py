@@ -9,11 +9,11 @@ import os
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 
-from pythonProject1.CryptoWrapper.CryptoWrapper import encode_with_performance_measurment_simetric, \
+from CryptoWrapper.CryptoWrapper import encode_with_performance_measurment_simetric, \
     encode_with_performance_measurment_asimetric, getFrameworks, getAlgorithmModes, getAlgorithmByFramework, \
-    getAlgorithmKeysLenghts, decode_ciphertext_simetric, perfData, logsProcessing
-from pythonProject1.criptograpy_module.KeyGenerator import KeyGenerator
-from pythonProject1.src.bd import Algorithm, PerformanceLogs, Repository
+    getAlgorithmKeysLenghts, decode_ciphertext_simetric
+from criptograpy_module.KeyGenerator import KeyGenerator
+from src.bd import Repository, PerformanceLogs
 
 
 class EncodePage(QWidget):
