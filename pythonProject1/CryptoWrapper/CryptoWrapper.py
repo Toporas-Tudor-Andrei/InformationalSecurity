@@ -316,6 +316,8 @@ if __name__ == "__main__":
 
     # exemplu apel perf data
     print(logsProcessing(perfData(alg="DES", framework="PyCryptodome", mode="cbc", keyLength="64"), "avg", "enc"))
+    print("aci")
+    print(logsProcessing(perfData(alg="RSA", framework="OpenSSL"), "avg", "enc"))
 
 
 

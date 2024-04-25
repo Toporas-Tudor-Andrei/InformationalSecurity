@@ -434,6 +434,11 @@ class PerformancesPage(QWidget):
         mode = self.mode_combo.currentText()
         keyLength = self.key_length_combo.currentText()
 
+        if mode == "":
+            mode = None
+        if keyLength == "":
+            keyLength = None
+
         performance_data = perfData(alg=algorithm, framework=framework, mode=mode, keyLength=keyLength)
         result = logsProcessing(performance_data, operation, target)
         if operation == "avg":
@@ -477,6 +482,7 @@ class PerformancesPage(QWidget):
         framework = self.framework_combo.currentText()
         algorithm_name = self.algorithm_combo.currentText()
         modes = getAlgorithmModes(framework, algorithm_name)
+        print("MODES", modes)
         self.mode_combo.addItems(sorted(modes))
 
     def update_algorithm_combo(self, index):
