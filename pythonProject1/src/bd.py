@@ -78,7 +78,22 @@ class Repository:
         last_id = self.session.query(self.__model.id).order_by(self.__model.id.desc()).first()
         return last_id[0] if last_id else None
 
-class Algorithm(Base):
+    @operation
+    def findAllJoinOn(self, joinModel, *args):
+        return self.session.execute(self.session.query(self.__model).add_entity(joinModel).join(joinModel).filter(*args)).fetchall()
+
+
+class Printable:
+    def __str__(self):
+        rpr = ",\n".join([f"{prop}={getattr(self, prop)}" for prop in self.__dict__
+                          if not callable(getattr(self, prop)) and not prop.startswith("_")])
+        return f"{{\n{rpr}\n}}"
+
+    def __repr__(self):
+        return self.__str__().replace("\n", "")
+
+
+class Algorithm(Base, Printable):
     __tablename__ = 'algorithm'
 
     id = Column(Integer, primary_key=True, autoincrement=True)
@@ -88,15 +103,8 @@ class Algorithm(Base):
     mode = Column(String, nullable=True) # For rsa can be nullable
     key_len = Column(Integer, nullable=True)
 
-    def __str__(self):
-        return f"{{\nid={self.id},\nname={self.name},\nframework={self.framework},\nsymmetric={self.symetric},\nmode={self.mode},\nkey_len={self.key_len}\n}}"
 
-    def __repr__(self):
-        return self.__str__().replace("\n", "")
-
-
-
-class File(Base):
+class File(Base, Printable):
     __tablename__ = 'file'
 
     id = Column(Integer, primary_key=True, autoincrement="auto")
@@ -105,7 +113,7 @@ class File(Base):
     encrypted = Column(Boolean, nullable=False)
 
 
-class Key(Base):
+class Key(Base, Printable):
     __tablename__ = 'key'
 
     id = Column(Integer, primary_key=True, autoincrement="auto")
@@ -118,7 +126,7 @@ class Key(Base):
     algorithm = relationship('Algorithm')
 
 
-class PerformanceLogs(Base):
+class PerformanceLogs(Base, Printable):
     __tablename__ = 'performance_logs'
 
     id = Column(Integer, primary_key=True, autoincrement="auto")
