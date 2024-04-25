@@ -38,9 +38,9 @@ for mode in modes:
         algRepo.insert(Algorithm(name="BF", framework="PyCryptodome", symetric=True, mode=mode, key_len=bf_key_size))
         algRepo.insert(Algorithm(name="BF", framework="Cryptography", symetric=True, mode=mode, key_len=bf_key_size))
 
-    algRepo.insert(Algorithm(name="RSA", framework="OpenSSL", symetric=False))
-    algRepo.insert(Algorithm(name="RSA", framework="PyCryptodome", symetric=False))
-    algRepo.insert(Algorithm(name="RSA", framework="Cryptography", symetric=False))
+algRepo.insert(Algorithm(name="RSA", framework="OpenSSL", symetric=False))
+algRepo.insert(Algorithm(name="RSA", framework="PyCryptodome", symetric=False))
+algRepo.insert(Algorithm(name="RSA", framework="Cryptography", symetric=False))
 
 
 
