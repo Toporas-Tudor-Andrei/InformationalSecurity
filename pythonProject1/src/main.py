@@ -81,6 +81,7 @@ class EncodePage(QWidget):
         layout.addWidget(back_button, alignment=Qt.AlignLeft)
         layout.addWidget(save_button, alignment=Qt.AlignRight)
 
+        self.algorithm_combo.currentIndexChanged.connect(self.update_mode_combo)
         self.setLayout(layout)
 
         self.apply_styles()
@@ -487,6 +488,7 @@ class PerformancesPage(QWidget):
         self.algorithm_combo.addItems(sorted(algorithm_names))
         self.algorithm_combo.currentIndexChanged.connect(self.update_key_combo)
         self.update_key_combo(0)
+        self.algorithm_combo.currentIndexChanged.connect(self.update_mode_combo)
 
     def update_key_combo(self, index):
         self.key_length_combo.clear()
