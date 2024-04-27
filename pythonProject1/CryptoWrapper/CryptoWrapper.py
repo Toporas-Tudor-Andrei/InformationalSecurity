@@ -26,19 +26,33 @@ def calculate_sha256_hash(data):
 
     return sha256_hash
 
+
 def mergeObjectProperties(objectToMergeFrom, objectToMergeTo): # source: http://byatool.com/uncategorized/simple-property-merge-for-python-objects/
     """
     Used to copy properties from one object to another if there isn't a naming conflict;
     """
     for property in objectToMergeFrom.__dict__:
-        #Check to make sure it can't be called... ie a method.
-        #Also make sure the objectobjectToMergeTo doesn't have a property of the same name.
+        # Check to make sure it can't be called... ie a method.
+        # Also make sure the objectobjectToMergeTo doesn't have a property of the same name.
         if not callable(objectToMergeFrom.__dict__[property]) and not hasattr(objectToMergeTo, property):
             setattr(objectToMergeTo, property, getattr(objectToMergeFrom, property))
         elif hasattr(objectToMergeTo, property):  # condition added by me :P
             setattr(objectToMergeTo, property + "_new", getattr(objectToMergeFrom, property))
 
     return objectToMergeTo
+
+
+def mergeAll(*objects):
+    acc = objects[0]
+    for it in objects[1:]:
+        acc = mergeObjectProperties(it, acc)
+    return acc
+
+
+class Bunch:
+    def __init__(self, **kwds):
+        self.__dict__.update(kwds)
+
 
 def getAlgorithms():
     return algRepo.findAll()
@@ -58,13 +72,13 @@ def getFrameworkByAlgorithm(algorithm):
 
 def perfData(fileId=None, /, *, alg=None, framework=None, mode=None, keyLength=None):
     """
-    Query function for finding the representative performance rows in the database
+    Query function for finding the representative performance rows joined with file in the database
     :param fileId: filter parameter for finding a certain file's data
     :param alg: filter parameter for algorithm name
     :param framework: filter parameter for framework name
     :param mode: filter parameter for the block encryption/decryption
     :param keyLength: length of the encryption/decryption key
-    :return: a list of PerformanceLogs objects corresponding to the filters given as parameters
+    :return: a list of PerformanceLogs (with new custom fields) corresponding to the filters given as parameters
     """
     filters = [getattr(Algorithm, col) == val for col, val in
                [("name", alg), ("framework", framework), ("mode", mode), ("key_len", keyLength)] if val is not None]
@@ -74,7 +88,13 @@ def perfData(fileId=None, /, *, alg=None, framework=None, mode=None, keyLength=N
                  [("file_id", fileId)] if val is not None]
 
     perf_file_data = perfRepo.findAllJoinOn(File, *file_cond, PerformanceLogs.algorithm_id.in_(ids))
-    return list(map(lambda it: mergeObjectProperties(it[1], it[0]), perf_file_data))
+    merged_data = [
+        mergeAll(*it, Bunch(**{
+            "enc_time_byte": it[0].encoding_time/it[1].bytes,
+            "dec_time_byte": it[0].decoding_time/it[1].bytes
+        }))
+        for it in perf_file_data]
+    return merged_data
 
 
 def logsProcessing(logs, operation, target):
@@ -83,13 +103,17 @@ def logsProcessing(logs, operation, target):
     :param logs: a list of PerformanceLogs objects to be aggregated
     :param operation: reduction method can take the values: "avg", "max", "min", "" - for no reduction
     :param target: slice of data to be used in the reduction can take the values:
-        "enc", "dec", "diff" - difference between encoding and decoding time, default "enc"
+        "enc", "enc_byte", "dec", "dec_byte", "diff" - difference between encoding and decoding time, default "enc"
     :return: the result of the reduction operation
     """
     if target == "enc":
         data = list(map(lambda it: it.encoding_time, logs))
+    elif target == "enc_byte":
+        data = list(map(lambda it: it.enc_time_byte, logs))
     elif target == "dec":
         data = list(map(lambda it: it.decoding_time, logs))
+    elif target == "dec_byte":
+        data = list(map(lambda it: it.dec_time_byte, logs))
     elif target == "diff":
         data = list(map(lambda it: it.encoding_time - it.decoding_time, logs))
     else:
@@ -107,6 +131,7 @@ def logsProcessing(logs, operation, target):
     else:
         return data
 
+
 def getAlgorithmModes(framework, algorithm):
     """
     Returns the list of available algorithm modes for each pair of fw-algorithm
@@ -114,6 +139,7 @@ def getAlgorithmModes(framework, algorithm):
     matching_entries = algRepo.findAll(Algorithm.framework == framework, Algorithm.name == algorithm)
     modes = set(entry.mode for entry in matching_entries if entry.mode)
     return list(modes)
+
 
 def getAlgorithmKeysLenghts(framework, algorithm):
     """
@@ -199,9 +225,9 @@ def decode_ciphertext_simetric(ciphertext):
 
     (time_performance_dec, decrypted_text) = encryption_adapter.decrypt(ciphertext, key, algorithm, mode)
 
-
     print("Ciphertext decripted with key " + str(key) + "\n Plaintext: " + decrypted_text)
-    return (key, decrypted_text)
+    return key, decrypted_text
+
 
 def decode_ciphertext_asimetric(ciphertext):
     """
@@ -237,9 +263,9 @@ def decode_ciphertext_asimetric(ciphertext):
 
     (time_performance_dec, decrypted_text) = encryption_adapter.decrypt(ciphertext, key, algorithm)
 
-
     print("Ciphertext decripted with key " + str(key) + "\n Plaintext: " + decrypted_text)
-    return (key, decrypted_text)
+    return key, decrypted_text
+
 
 def encode_with_performance_measurment_asimetric(plaintext, framework, algorithm, public_key, private_key):
     """
@@ -287,7 +313,7 @@ if __name__ == "__main__":
     print(getFrameworkByAlgorithm("AES"))
     print(algRepo.findAll(Algorithm.name.in_(["AES", "DES"])))
     print("===========================HERE========================================")
-    print(perfData()[0].id_new)
+    print(perfData())
     print(perfRepo.findAll())
 
     # lista cu moduri de rulare disponibile pt un alg
@@ -318,6 +344,10 @@ if __name__ == "__main__":
     print(logsProcessing(perfData(alg="DES", framework="PyCryptodome", mode="cbc", keyLength="64"), "avg", "enc"))
     print("aci")
     print(logsProcessing(perfData(alg="RSA", framework="OpenSSL"), "avg", "enc"))
-
+    print([it for it in dir(2) if not callable(getattr(2, it))])
+    print("denominator", getattr(2, "denominator"))
+    print("imag", getattr(2, "imag"))
+    print("numerator", getattr(2, "numerator"))
+    print("real", getattr(2, "real"))
 
 

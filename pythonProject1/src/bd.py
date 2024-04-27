@@ -80,7 +80,7 @@ class Repository:
 
     @operation
     def findAllJoinOn(self, joinModel, *args):
-        return self.session.execute(self.session.query(self.__model).add_entity(joinModel).join(joinModel).filter(*args)).fetchall()
+        return self.session.execute(self.session.query(self.__model, joinModel).join(joinModel).filter(*args)).fetchall()
 
 
 class Printable:
