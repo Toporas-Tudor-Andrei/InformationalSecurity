@@ -225,7 +225,7 @@ def decode_ciphertext_simetric(ciphertext):
     algorithm = algorithm_reg.name
     mode = algorithm_reg.mode
 
-    (time_performance_dec, decrypted_text) = encryption_adapter.decrypt(ciphertext, key, algorithm, mode)
+    (time_performance_dec, memory, decrypted_text) = encryption_adapter.decrypt(ciphertext, key, algorithm, mode)
 
     print("Ciphertext decripted with key " + str(key) + "\n Plaintext: " + decrypted_text)
     return key, decrypted_text
@@ -263,7 +263,7 @@ def decode_ciphertext_asimetric(ciphertext):
     key = decription_key_reg.encryptionkey
     algorithm = algorithm_reg.name
 
-    (time_performance_dec, decrypted_text) = encryption_adapter.decrypt(ciphertext, key, algorithm)
+    (time_performance_dec, memory, decrypted_text) = encryption_adapter.decrypt(ciphertext, key, algorithm)
 
     print("Ciphertext decripted with key " + str(key) + "\n Plaintext: " + decrypted_text)
     return key, decrypted_text
