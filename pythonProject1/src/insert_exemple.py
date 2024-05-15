@@ -1,4 +1,4 @@
-from pythonProject1.src.bd import *
+from src.bd import *
 
 algRepo = Repository.of(Algorithm)
 fileRepo = Repository.of(File)

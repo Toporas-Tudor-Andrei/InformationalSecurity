@@ -1,9 +1,9 @@
-from pythonProject1.criptograpy_module.Cryptography import Cryptography
-from pythonProject1.criptograpy_module.Adaptors import SymmetricEncryptionAdapter, AsymmetricEncryptionAdapter
-from pythonProject1.criptograpy_module.KeyGenerator import KeyGenerator
-from pythonProject1.criptograpy_module.OpenSSL import OpenSSL
-from pythonProject1.criptograpy_module.PyCryptodome import PyCryptodome
-from pythonProject1.src.bd import *
+from criptograpy_module.Cryptography import Cryptography
+from criptograpy_module.Adaptors import SymmetricEncryptionAdapter, AsymmetricEncryptionAdapter
+from criptograpy_module.KeyGenerator import KeyGenerator
+from criptograpy_module.OpenSSL import OpenSSL
+from criptograpy_module.PyCryptodome import PyCryptodome
+from src.bd import *
 import hashlib
 
 algRepo = Repository.of(Algorithm)
@@ -91,7 +91,9 @@ def perfData(fileId=None, /, *, alg=None, framework=None, mode=None, keyLength=N
     merged_data = [
         mergeAll(*it, Bunch(**{
             "enc_time_byte": it[0].encoding_time/it[1].bytes,
-            "dec_time_byte": it[0].decoding_time/it[1].bytes
+            "dec_time_byte": it[0].decoding_time/it[1].bytes,
+            "mem_usage_enc_byte": it[0].mem_usage_enc/it[1].bytes,
+            "mem_usage_dec_byte": it[0].mem_usage_dec/it[1].bytes
         }))
         for it in perf_file_data]
     return merged_data
@@ -165,7 +167,7 @@ def encode_with_performance_measurment_simetric(plaintext, framework, algorithm,
     else:
         raise ValueError("Invalid framework specified.")
 
-    (time_performance_enc, ciphertext) = encryption_adapter.encrypt(plaintext, key, algorithm, mode)
+    (time_performance_enc, memory_usage_enc, ciphertext) = encryption_adapter.encrypt(plaintext, key, algorithm, mode)
 
     # 1. Register in file table
     fileRepo.insert(File(hash=calculate_sha256_hash(plaintext), bytes=len(plaintext.encode('utf-8')), encrypted=False))
@@ -183,8 +185,8 @@ def encode_with_performance_measurment_simetric(plaintext, framework, algorithm,
     keyRepo.insert(Key(file_id=id_encoded_file, algorithm_id=algorithm_id, isprivate=False, encryptionkey=key))
 
     # 3. Register in performances table
-    (time_performance_dec, decrypted_text) = encryption_adapter.decrypt(ciphertext, key, algorithm, mode)
-    perfRepo.insert(PerformanceLogs(encoding_time=time_performance_enc, decoding_time=time_performance_dec, file_id=id_file, algorithm_id=algorithm_id))
+    (time_performance_dec, memory_usage_dec, decrypted_text) = encryption_adapter.decrypt(ciphertext, key, algorithm, mode)
+    perfRepo.insert(PerformanceLogs(encoding_time=time_performance_enc, decoding_time=time_performance_dec, mem_usage_enc=memory_usage_enc, mem_usage_dec=memory_usage_dec,file_id=id_file, algorithm_id=algorithm_id))
 
     # 4. Returns the ciphertext to be saved in the chosen location
     return ciphertext
@@ -282,7 +284,7 @@ def encode_with_performance_measurment_asimetric(plaintext, framework, algorithm
     else:
         raise ValueError("Invalid framework specified.")
 
-    (time_performance_enc, ciphertext) = encryption_adapter.encrypt(plaintext, public_key, algorithm)
+    (time_performance_enc, memory_usage_enc, ciphertext) = encryption_adapter.encrypt(plaintext, public_key, algorithm)
 
     # 1. Register in file table
     fileRepo.insert(File(hash=calculate_sha256_hash(plaintext), bytes=len(plaintext.encode('utf-8')), encrypted=False))
@@ -298,8 +300,8 @@ def encode_with_performance_measurment_asimetric(plaintext, framework, algorithm
     keyRepo.insert(Key(file_id=id_encoded_file, algorithm_id=algorithm_id, isprivate=True, encryptionkey=private_key))
 
     # 3. Register in performances table
-    (time_performance_dec, decrypted_text) = encryption_adapter.decrypt(ciphertext, private_key, algorithm)
-    perfRepo.insert(PerformanceLogs(encoding_time=time_performance_enc, decoding_time=time_performance_dec, file_id=id_file, algorithm_id=algorithm_id))
+    (time_performance_dec, memory_usage_dec, decrypted_text) = encryption_adapter.decrypt(ciphertext, private_key, algorithm)
+    perfRepo.insert(PerformanceLogs(encoding_time=time_performance_enc, decoding_time=time_performance_dec, mem_usage_enc=memory_usage_enc, mem_usage_dec=memory_usage_dec, file_id=id_file, algorithm_id=algorithm_id))
 
     # 4. Returns the ciphertext to be saved in the chosen location
     return ciphertext

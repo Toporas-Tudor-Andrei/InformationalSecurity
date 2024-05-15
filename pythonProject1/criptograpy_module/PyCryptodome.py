@@ -2,14 +2,13 @@ import os
 from Crypto.Cipher import PKCS1_OAEP, AES, DES3, Blowfish, DES
 from Crypto.PublicKey import RSA
 from Crypto.Util import Padding
-from pythonProject1.Performance.Decorators import *
+from Performance.Decorators import stats
 
 class PyCryptodome:
     """
     Quacks like a framework
     """
-    @time_it
-    @memory_usage
+    @stats
     @staticmethod
     def encrypt_aes(plaintext, key, mode='ecb'):
         valid_key_sizes = [128, 192, 256]
@@ -39,8 +38,7 @@ class PyCryptodome:
         ciphertext = cipher.encrypt(padded_plaintext)
         return iv + ciphertext
 
-    @time_it
-    @memory_usage
+    @stats
     @staticmethod
     def decrypt_aes(ciphertext, key, mode='ecb'):
         valid_key_sizes = [128, 192, 256]
@@ -72,8 +70,7 @@ class PyCryptodome:
         unpadded_text = Padding.unpad(decrypted_text, AES.block_size)
         return unpadded_text.decode()
 
-    @time_it
-    @memory_usage
+    @stats
     @staticmethod
     def encrypt_des(plaintext, key, mode='ecb'):
         valid_key_sizes = [64]
@@ -104,8 +101,7 @@ class PyCryptodome:
         ciphertext = cipher.encrypt(padded_plaintext)
         return iv + ciphertext
 
-    @time_it
-    @memory_usage
+    @stats
     @staticmethod
     def decrypt_des(ciphertext, key, mode='ecb'):
         valid_key_sizes = [64]
@@ -140,8 +136,7 @@ class PyCryptodome:
 
 
 
-    @time_it
-    @memory_usage
+    @stats
     @staticmethod
     def encrypt_bf(plaintext, key, mode='ecb'):
         valid_key_sizes = [64, 128, 192, 256]
@@ -171,8 +166,7 @@ class PyCryptodome:
         ciphertext = cipher.encrypt(padded_plaintext)
         return iv + ciphertext
 
-    @time_it
-    @memory_usage
+    @stats
     @staticmethod
     def decrypt_bf(ciphertext, key, mode='ecb'):
         valid_key_sizes = [64, 128, 192, 256]
@@ -204,8 +198,7 @@ class PyCryptodome:
         unpadded_text = Padding.unpad(decrypted_text, Blowfish.block_size)
         return unpadded_text.decode()
 
-    @time_it
-    @memory_usage
+    @stats
     @staticmethod
     def encrypt_rsa(plaintext, public_key):
         public_key = RSA.import_key(public_key)
@@ -213,8 +206,7 @@ class PyCryptodome:
         ciphertext = cipher.encrypt(plaintext.encode())
         return ciphertext
 
-    @time_it
-    @memory_usage
+    @stats
     @staticmethod
     def decrypt_rsa(ciphertext, private_key):
         private_key = RSA.import_key(private_key)

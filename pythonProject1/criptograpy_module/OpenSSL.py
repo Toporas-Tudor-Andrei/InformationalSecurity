@@ -3,15 +3,14 @@ import subprocess
 import tempfile
 from base64 import *
 
-from pythonProject1.Performance.Decorators import *
+from Performance.Decorators import stats
 
 class OpenSSL:
     """
     Quacks like a framework
     """
 
-    @time_it
-    @memory_usage
+    @stats
     @staticmethod
     def encrypt_aes(plaintext, key, mode='ecb'):
         valid_key_sizes = [128, 192, 256]
@@ -30,8 +29,7 @@ class OpenSSL:
         encrypted_text = b64decode(subprocess.check_output(openssl_cmd, shell=True))
         return iv + encrypted_text.strip()
 
-    @time_it
-    @memory_usage
+    @stats
     @staticmethod
     def decrypt_aes(ciphertext, key, mode='ecb'):
         valid_key_sizes = [128, 192, 256]
@@ -51,8 +49,7 @@ class OpenSSL:
         decrypted_text = subprocess.check_output(openssl_cmd, shell=True).decode()
         return decrypted_text.strip()
 
-    @time_it
-    @memory_usage
+    @stats
     @staticmethod
     def encrypt_des(plaintext, key, mode='ecb'):
         valid_key_sizes = [64]
@@ -72,8 +69,7 @@ class OpenSSL:
         encrypted_text = b64decode(subprocess.check_output(openssl_cmd, shell=True))
         return iv + encrypted_text.strip()
 
-    @time_it
-    @memory_usage
+    @stats
     @staticmethod
     def decrypt_des(ciphertext, key, mode='ecb'):
         valid_key_sizes = [64]
@@ -93,8 +89,7 @@ class OpenSSL:
         decrypted_text = subprocess.check_output(openssl_cmd, shell=True).decode()
         return decrypted_text.strip()
 
-    @time_it
-    @memory_usage
+    @stats
     @staticmethod
     def encrypt_bf(plaintext, key, mode='ecb'):
         valid_key_sizes = [64, 128, 192, 256]
@@ -114,8 +109,7 @@ class OpenSSL:
         encrypted_text = b64decode(subprocess.check_output(openssl_cmd, shell=True))
         return iv + encrypted_text.strip()
 
-    @time_it
-    @memory_usage
+    @stats
     @staticmethod
     def decrypt_bf(ciphertext, key, mode='ecb'):
         valid_key_sizes = [64, 128, 192, 256]
@@ -135,8 +129,7 @@ class OpenSSL:
         decrypted_text = subprocess.check_output(openssl_cmd, shell=True).decode()
         return decrypted_text.strip()
 
-    @time_it
-    @memory_usage
+    @stats
     @staticmethod
     def encrypt_rsa(plaintext, public_key):
         """Encrypt the plaintext using RSA."""
@@ -164,8 +157,7 @@ class OpenSSL:
 
         return encrypted_text
 
-    @time_it
-    @memory_usage
+    @stats
     @staticmethod
     def decrypt_rsa(ciphertext, private_key):
         """Decrypt the ciphertext using RSA."""

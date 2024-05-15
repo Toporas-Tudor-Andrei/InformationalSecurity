@@ -132,6 +132,8 @@ class PerformanceLogs(Base, Printable):
     id = Column(Integer, primary_key=True, autoincrement="auto")
     encoding_time = Column(Float, nullable=False)
     decoding_time = Column(Float, nullable=False)
+    mem_usage_enc = Column(Float, nullable=False)
+    mem_usage_dec = Column(Float, nullable=False)
     file_id = Column(String, ForeignKey('file.id'), nullable=False)
     algorithm_id = Column(String, ForeignKey('algorithm.id'), nullable=False)
 

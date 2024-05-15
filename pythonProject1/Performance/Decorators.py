@@ -2,6 +2,7 @@ import time
 from functools import wraps
 import memory_profiler
 
+
 def time_it(func):
     """
     Decorator function that tracks the time of execution of the function that it decorates
@@ -11,13 +12,14 @@ def time_it(func):
     @wraps(func)
     def wrapper(*args, **kwargs):
         start = time.time()
-        result = func.__func__(*args, **kwargs)
+        result = func(*args, **kwargs)
         end = time.time()
         execution_time = (end - start) * 1000
-        print(f"Function '{func.__func__.__name__}' executed in {execution_time:.2f} ms")
+        print(f"Function '{func.__name__}' executed in {execution_time:.2f} ms")
         return execution_time, result
 
     return wrapper
+
 
 def memory_usage(func):
     """
@@ -37,5 +39,8 @@ def memory_usage(func):
     return wrapper
 
 
-
-
+def stats(f):
+    def wrapper(*args, **kwargs):
+        (exec_time, (mem, res)) = time_it(memory_usage(f))(*args, **kwargs)
+        return exec_time, mem, res
+    return wrapper
