@@ -2,8 +2,8 @@ import os
 from cryptography.hazmat.backends import default_backend
 from cryptography.hazmat.primitives import serialization, padding
 from cryptography.hazmat.primitives import hashes, asymmetric
-from cryptography.hazmat.primitives.ciphers import Cipher, algorithms, modes
-from Performance.Decorators import *
+from cryptography.hazmat.primitives.ciphers import Cipher, modes, algorithms
+from pythonProject1.Performance.Decorators import *
 
 
 class Cryptography:
@@ -12,6 +12,7 @@ class Cryptography:
     """
 
     @time_it
+    @memory_usage
     @staticmethod
     def encrypt_aes(plaintext, key, mode='ecb'):
         valid_key_sizes = [128, 192, 256]
@@ -47,6 +48,7 @@ class Cryptography:
         return iv + ciphertext
 
     @time_it
+    @memory_usage
     @staticmethod
     def decrypt_aes(ciphertext, key, mode='ecb'):
         valid_key_sizes = [128, 192, 256]
@@ -85,6 +87,7 @@ class Cryptography:
         return plaintext.decode()
 
     @time_it
+    @memory_usage
     @staticmethod
     def encrypt_3des(plaintext, key, mode='ecb'):
         valid_key_sizes = [192]
@@ -121,6 +124,7 @@ class Cryptography:
         return iv + ciphertext
 
     @time_it
+    @memory_usage
     @staticmethod
     def decrypt_3des(ciphertext, key, mode='ecb'):
         valid_key_sizes = [192]
@@ -159,6 +163,7 @@ class Cryptography:
         return plaintext.decode()
 
     @time_it
+    @memory_usage
     @staticmethod
     def encrypt_bf(plaintext, key, mode='ecb'):
         valid_key_sizes = [64, 128, 192, 256]
@@ -195,6 +200,7 @@ class Cryptography:
         return iv + ciphertext
 
     @time_it
+    @memory_usage
     @staticmethod
     def decrypt_bf(ciphertext, key, mode='ecb'):
         valid_key_sizes = [64, 128, 192, 256]
@@ -233,6 +239,7 @@ class Cryptography:
         return plaintext.decode()
 
     @time_it
+    @memory_usage
     @staticmethod
     def encrypt_rsa(plaintext, public_key):
         public_key = serialization.load_pem_public_key(public_key, backend=default_backend())
@@ -247,6 +254,7 @@ class Cryptography:
         return ciphertext
 
     @time_it
+    @memory_usage
     @staticmethod
     def decrypt_rsa(ciphertext, private_key):
         private_key = serialization.load_pem_private_key(private_key, password=None, backend=default_backend())

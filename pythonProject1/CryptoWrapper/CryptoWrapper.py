@@ -1,9 +1,9 @@
-from criptograpy_module.Cryptography import Cryptography
-from criptograpy_module.Adaptors import SymmetricEncryptionAdapter, AsymmetricEncryptionAdapter
-from criptograpy_module.KeyGenerator import KeyGenerator
-from criptograpy_module.OpenSSL import OpenSSL
-from criptograpy_module.PyCryptodome import PyCryptodome
-from src.bd import *
+from pythonProject1.criptograpy_module.Cryptography import Cryptography
+from pythonProject1.criptograpy_module.Adaptors import SymmetricEncryptionAdapter, AsymmetricEncryptionAdapter
+from pythonProject1.criptograpy_module.KeyGenerator import KeyGenerator
+from pythonProject1.criptograpy_module.OpenSSL import OpenSSL
+from pythonProject1.criptograpy_module.PyCryptodome import PyCryptodome
+from pythonProject1.src.bd import *
 import hashlib
 
 algRepo = Repository.of(Algorithm)
