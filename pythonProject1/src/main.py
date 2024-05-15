@@ -5,15 +5,17 @@ from PyQt5.QtGui import *
 from PyQt5.QtCore import *
 import sys
 import os
+import matplotlib.pyplot as plt
+from matplotlib.backends.backend_qt5agg import FigureCanvasQTAgg as FigureCanvas
 
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 
-from CryptoWrapper.CryptoWrapper import encode_with_performance_measurment_simetric, \
+from pythonProject1.CryptoWrapper.CryptoWrapper import encode_with_performance_measurment_simetric, \
     encode_with_performance_measurment_asimetric, getFrameworks, getAlgorithmModes, getAlgorithmByFramework, \
     getAlgorithmKeysLenghts, decode_ciphertext_simetric, decode_ciphertext_asimetric, perfData, logsProcessing
-from criptograpy_module.KeyGenerator import KeyGenerator
-from src.bd import Repository, PerformanceLogs
+from pythonProject1.criptograpy_module.KeyGenerator import KeyGenerator
+from pythonProject1.src.bd import Repository, PerformanceLogs
 
 
 
@@ -376,6 +378,8 @@ class PerformancesPage(QWidget):
         self.table_widget = QTableWidget()
         layout.addWidget(self.table_widget)
 
+
+
         back_button = QPushButton('Back')
         back_button.clicked.connect(self.parent().back_to_main)
 
@@ -385,7 +389,7 @@ class PerformancesPage(QWidget):
 
         self.apply_styles()
 
-        headers = ['ID', 'Encoding Time', 'Decoding Time', 'File ID', 'Algorithm ID', 'File Size']
+        headers = ['ID', 'Encoding Time', 'Decoding Time', 'Memory Usage Enc', 'Memory Usage Dec','File ID', 'Algorithm ID', 'File Size']
         self.table_widget.setColumnCount(len(headers))
         self.table_widget.setHorizontalHeaderLabels(headers)
 
@@ -451,25 +455,61 @@ class PerformancesPage(QWidget):
 
         self.update_performance_table(performance_data)
 
+        bytes_data = [log.bytes for log in performance_data]
+        mem_usage_enc_data = [log.mem_usage_enc for log in performance_data]
+        mem_usage_dec_data = [log.mem_usage_dec for log in performance_data]
+        encoding_time_data = [log.encoding_time for log in performance_data]
+        decoding_time_data = [log.decoding_time for log in performance_data]
+
+        fig, axs = plt.subplots(2, 2, figsize=(12, 10))
+
+        axs[0, 0].plot(bytes_data, encoding_time_data, marker='o', linestyle='-')
+        axs[0, 0].set_xlabel('Bytes')
+        axs[0, 0].set_ylabel('Encoding Time')
+        axs[0, 0].grid(True)
+
+        axs[0, 1].plot(bytes_data, decoding_time_data, marker='o', linestyle='-')
+        axs[0, 1].set_xlabel('Bytes')
+        axs[0, 1].set_ylabel('Decoding Time')
+        axs[0, 1].grid(True)
+
+        axs[1, 0].plot(bytes_data, mem_usage_enc_data, marker='o', linestyle='-')
+        axs[1, 0].set_xlabel('Bytes')
+        axs[1, 0].set_ylabel('Memory Usage (Encryption)')
+        axs[1, 0].grid(True)
+
+        axs[1, 1].plot(bytes_data, mem_usage_dec_data, marker='o', linestyle='-')
+        axs[1, 1].set_xlabel('Bytes')
+        axs[1, 1].set_ylabel('Memory Usage (Decryption)')
+        axs[1, 1].grid(True)
+
+        plt.tight_layout()
+        plt.show()
+
     def update_performance_table(self, performance_data):
         self.table_widget.clearContents()
 
         num_rows = len(performance_data)
         self.table_widget.setRowCount(num_rows)
-        num_cols = 6
+        num_cols = 8
         self.table_widget.setColumnCount(num_cols)
 
         for row, log in enumerate(performance_data):
             self.table_widget.setItem(row, 0, QTableWidgetItem(str(log.id)))
             self.table_widget.setItem(row, 1, QTableWidgetItem(str(log.encoding_time)))
             self.table_widget.setItem(row, 2, QTableWidgetItem(str(log.decoding_time)))
-            self.table_widget.setItem(row, 3, QTableWidgetItem(str(log.file_id)))
-            self.table_widget.setItem(row, 4, QTableWidgetItem(str(log.algorithm_id)))
-            self.table_widget.setItem(row, 5, QTableWidgetItem(str(log.bytes)))
+            self.table_widget.setItem(row, 3, QTableWidgetItem(str(log.mem_usage_enc)))
+            self.table_widget.setItem(row, 4, QTableWidgetItem(str(log.mem_usage_dec)))
+            self.table_widget.setItem(row, 5, QTableWidgetItem(str(log.file_id)))
+            self.table_widget.setItem(row, 6, QTableWidgetItem(str(log.algorithm_id)))
+            self.table_widget.setItem(row, 7, QTableWidgetItem(str(log.bytes)))
 
 
         self.table_widget.resizeColumnsToContents()
         self.table_widget.resizeRowsToContents()
+
+
+
     def populate_comboboxes(self):
         frameworks = getFrameworks()
         self.framework_combo.addItems(sorted(list(frameworks)))
