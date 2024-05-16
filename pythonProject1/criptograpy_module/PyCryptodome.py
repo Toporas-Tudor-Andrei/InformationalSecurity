@@ -194,7 +194,7 @@ class PyCryptodome:
         else:
             raise ValueError("Invalid mode. Supported modes are 'ecb', 'cbc', 'cfb', and 'ofb'.")
 
-        decrypted_text = cipher.decrypt(ciphertext)
+        decrypted_text = cipher.decrypt(ciphertext_data)
         unpadded_text = Padding.unpad(decrypted_text, Blowfish.block_size)
         return unpadded_text.decode()
 
