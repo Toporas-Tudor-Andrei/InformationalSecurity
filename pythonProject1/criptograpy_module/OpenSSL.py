@@ -33,7 +33,7 @@ class OpenSSL:
     @staticmethod
     def decrypt_aes(ciphertext, key, mode='ecb'):
         valid_key_sizes = [128, 192, 256]
-        key_size = (len(key))
+        key_size = (len(key) * 8)
         if key_size not in valid_key_sizes:
             raise ValueError(f"Invalid key size for AES encryption. Choose from: {valid_key_sizes}")
 

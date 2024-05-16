@@ -11,11 +11,11 @@ from matplotlib.backends.backend_qt5agg import FigureCanvasQTAgg as FigureCanvas
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 
-from pythonProject1.CryptoWrapper.CryptoWrapper import encode_with_performance_measurment_simetric, \
+from CryptoWrapper.CryptoWrapper import encode_with_performance_measurment_simetric, \
     encode_with_performance_measurment_asimetric, getFrameworks, getAlgorithmModes, getAlgorithmByFramework, \
     getAlgorithmKeysLenghts, decode_ciphertext_simetric, decode_ciphertext_asimetric, perfData, logsProcessing
-from pythonProject1.criptograpy_module.KeyGenerator import KeyGenerator
-from pythonProject1.src.bd import Repository, PerformanceLogs
+from criptograpy_module.KeyGenerator import KeyGenerator
+from src.bd import Repository, PerformanceLogs
 
 
 
