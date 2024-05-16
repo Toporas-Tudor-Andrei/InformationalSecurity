@@ -11,11 +11,11 @@ from matplotlib.backends.backend_qt5agg import FigureCanvasQTAgg as FigureCanvas
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 
-from pythonProject1.CryptoWrapper.CryptoWrapper import encode_with_performance_measurment_simetric, \
+from CryptoWrapper.CryptoWrapper import encode_with_performance_measurment_simetric, \
     encode_with_performance_measurment_asimetric, getFrameworks, getAlgorithmModes, getAlgorithmByFramework, \
     getAlgorithmKeysLenghts, decode_ciphertext_simetric, decode_ciphertext_asimetric, perfData, logsProcessing
-from pythonProject1.criptograpy_module.KeyGenerator import KeyGenerator
-from pythonProject1.src.bd import Repository, PerformanceLogs
+from criptograpy_module.KeyGenerator import KeyGenerator
+from src.bd import Repository, PerformanceLogs
 
 
 
@@ -475,22 +475,22 @@ class PerformancesPage(QWidget):
 
         fig, axs = plt.subplots(2, 2, figsize=(12, 10))
 
-        axs[0, 0].plot(bytes_data_t_e, encoding_time_data, marker='o', linestyle='-')
+        axs[0, 0].plot(encoding_time_data,bytes_data_t_e, marker='o', linestyle='-')
         axs[0, 0].set_xlabel('Bytes')
         axs[0, 0].set_ylabel('Encoding Time')
         axs[0, 0].grid(True)
 
-        axs[0, 1].plot(bytes_data_t_d, decoding_time_data, marker='o', linestyle='-')
+        axs[0, 1].plot( decoding_time_data,bytes_data_t_d, marker='o', linestyle='-')
         axs[0, 1].set_xlabel('Bytes')
         axs[0, 1].set_ylabel('Decoding Time')
         axs[0, 1].grid(True)
 
-        axs[1, 0].plot(bytes_data_m_e, mem_usage_enc_data, marker='o', linestyle='-')
+        axs[1, 0].plot( mem_usage_enc_data,bytes_data_m_e, marker='o', linestyle='-')
         axs[1, 0].set_xlabel('Bytes')
         axs[1, 0].set_ylabel('Memory Usage (Encryption)')
         axs[1, 0].grid(True)
 
-        axs[1, 1].plot(bytes_data_m_d, mem_usage_dec_data, marker='o', linestyle='-')
+        axs[1, 1].plot( mem_usage_dec_data,bytes_data_m_d, marker='o', linestyle='-')
         axs[1, 1].set_xlabel('Bytes')
         axs[1, 1].set_ylabel('Memory Usage (Decryption)')
         axs[1, 1].grid(True)
