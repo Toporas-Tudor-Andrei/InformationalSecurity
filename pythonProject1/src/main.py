@@ -11,11 +11,11 @@ from matplotlib.backends.backend_qt5agg import FigureCanvasQTAgg as FigureCanvas
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 
-from CryptoWrapper.CryptoWrapper import encode_with_performance_measurment_simetric, \
+from pythonProject1.CryptoWrapper.CryptoWrapper import encode_with_performance_measurment_simetric, \
     encode_with_performance_measurment_asimetric, getFrameworks, getAlgorithmModes, getAlgorithmByFramework, \
     getAlgorithmKeysLenghts, decode_ciphertext_simetric, decode_ciphertext_asimetric, perfData, logsProcessing
-from criptograpy_module.KeyGenerator import KeyGenerator
-from src.bd import Repository, PerformanceLogs
+from pythonProject1.criptograpy_module.KeyGenerator import KeyGenerator
+from pythonProject1.src.bd import Repository, PerformanceLogs
 
 
 
@@ -455,30 +455,42 @@ class PerformancesPage(QWidget):
 
         self.update_performance_table(performance_data)
 
-        bytes_data = [log.bytes for log in performance_data]
-        mem_usage_enc_data = [log.mem_usage_enc for log in performance_data]
-        mem_usage_dec_data = [log.mem_usage_dec for log in performance_data]
-        encoding_time_data = [log.encoding_time for log in performance_data]
-        decoding_time_data = [log.decoding_time for log in performance_data]
+        mem_u_enc_data = sorted(performance_data, key=lambda it: it.mem_usage_enc)
+        mem_u_dec_data = sorted(performance_data, key=lambda it: it.mem_usage_dec)
+        time_e_data = sorted(performance_data, key=lambda it: it.encoding_time)
+        time_d_data = sorted(performance_data, key=lambda it: it.decoding_time)
+
+        mem_usage_enc_data = [log.mem_usage_enc for log in mem_u_enc_data]
+        bytes_data_m_e = [log.bytes for log in mem_u_enc_data]
+
+        mem_usage_dec_data = [log.mem_usage_dec for log in mem_u_dec_data]
+        bytes_data_m_d = [log.bytes for log in mem_u_dec_data]
+
+        encoding_time_data = [log.encoding_time for log in time_e_data]
+        bytes_data_t_e = [log.bytes for log in time_e_data]
+
+        decoding_time_data = [log.decoding_time for log in time_d_data]
+        bytes_data_t_d = [log.bytes for log in time_d_data]
+
 
         fig, axs = plt.subplots(2, 2, figsize=(12, 10))
 
-        axs[0, 0].plot(bytes_data, encoding_time_data, marker='o', linestyle='-')
+        axs[0, 0].plot(bytes_data_t_e, encoding_time_data, marker='o', linestyle='-')
         axs[0, 0].set_xlabel('Bytes')
         axs[0, 0].set_ylabel('Encoding Time')
         axs[0, 0].grid(True)
 
-        axs[0, 1].plot(bytes_data, decoding_time_data, marker='o', linestyle='-')
+        axs[0, 1].plot(bytes_data_t_d, decoding_time_data, marker='o', linestyle='-')
         axs[0, 1].set_xlabel('Bytes')
         axs[0, 1].set_ylabel('Decoding Time')
         axs[0, 1].grid(True)
 
-        axs[1, 0].plot(bytes_data, mem_usage_enc_data, marker='o', linestyle='-')
+        axs[1, 0].plot(bytes_data_m_e, mem_usage_enc_data, marker='o', linestyle='-')
         axs[1, 0].set_xlabel('Bytes')
         axs[1, 0].set_ylabel('Memory Usage (Encryption)')
         axs[1, 0].grid(True)
 
-        axs[1, 1].plot(bytes_data, mem_usage_dec_data, marker='o', linestyle='-')
+        axs[1, 1].plot(bytes_data_m_d, mem_usage_dec_data, marker='o', linestyle='-')
         axs[1, 1].set_xlabel('Bytes')
         axs[1, 1].set_ylabel('Memory Usage (Decryption)')
         axs[1, 1].grid(True)
